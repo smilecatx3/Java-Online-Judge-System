@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;" charset="UTF-8">
+	<title>Java Homework Online Judge System</title>
+	<link rel="shortcut icon" href="resource/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="css/btn.css">
+	<style>
+		html {
+			height: 100%; 
+			text-align: center;
+			overflow-y: hidden;
+		}
+		body {
+			height: 100%;
+			text-align: center;
+		}
+		form {
+			font-size: 20px;
+		}
+		select {
+			font-family: Times New Roman;
+			font-size: 18px;
+		}
+		.select_hwID {
+			box-shadow: 1px 1px 1px 1px #96A6FF;
+			font-size: 20px;
+		}
+		hr { 
+			height: 12px; border: 0; box-shadow: inset 0 12px 12px -12px #48BB1E;
+		}
+	</style>
+	<script type="text/javascript" src="js/prototype.js"></script>
+	<script type="text/javascript" >
+		function setIFrameHeight() {
+			var iFrame = document.getElementById("judge");
+			var frameTop = iFrame.getBoundingClientRect().top;
+			var bodyBottom = document.body.getBoundingClientRect().bottom;
+			var height = bodyBottom - frameTop - 50;
+			iFrame.setStyle({height: height+"px"});
+		}
+	</script>
+</head>	
+<body link="blue" vlink="blue" onresize="setIFrameHeight();">
+
+<font style="font-family:Lucida Sans Unicode; font-size:32px; font-weight:bold; text-shadow:3px 3px 3px #cccccc;"> Java Homework Online Judge System </font>
+<p>
+
+<form enctype="multipart/form-data" method="POST" action="judge.jsp" target="judge">
+	<select id="hwID" name="hwID" class="select_hwID">
+		<option value="hw1" selected>hw1</option>
+	</select>　　
+	Student ID: <input type="text" id="studentID" name="studentID" />　　
+	<select id="mode" name="mode">
+		<option value="normal">normal</option>
+		<option value="stdin">stdin</option>
+	</select>　　
+	<input type="file" name="file" size="30" accept=".zip" style="border-color:#31BAFA; border-width:1px; border-style:ridge;" />　　
+	<input type="submit" value="SUBMIT" class="btn_submit" />
+</form>
+<hr>
+
+<iframe id="judge" name="judge" onload="setIFrameHeight();" width="90%" style="border:0px ridge #F4E34F;" />
+
+</body>
+</html>

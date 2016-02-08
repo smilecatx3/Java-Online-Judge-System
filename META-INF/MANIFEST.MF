@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: tw.edu.ncku.csie.selab.jojs.JOJS
+Class-Path: . org.json.jar commons-io-2.4.jar zip4j_1.3.2.jar
