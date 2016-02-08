@@ -1,0 +1,5 @@
+<project default="compile">
+	<target name="compile">
+		<javac includeantruntime="false" encoding="UTF-8" srcdir="SRCDIR" destdir="DESTDIR"/>
+	</target>
+</project>

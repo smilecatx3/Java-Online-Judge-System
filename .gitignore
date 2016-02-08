@@ -1,0 +1,13 @@
+bak/
+temp/
+
+*.jar
+*.class
+*.DS_Store
+*.gif
+*.jpg
+*.ico
+
+# Intellij Idea project files
+.idea/
+*.iml

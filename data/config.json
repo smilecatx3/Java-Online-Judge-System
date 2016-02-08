@@ -1,0 +1,10 @@
+{
+    "compilation" : {
+        "ant_path" : "apache-ant-1.9.6/bin/ant.bat"
+    },
+
+    "execution" : {
+        "timeout" : 10,
+        "testcase_folder" : "testcase"
+    }
+}
