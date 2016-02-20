@@ -1,10 +1,6 @@
 {
-    "compilation" : {
-        "ant_path" : "apache-ant-1.9.6/bin/ant.bat"
-    },
-
-    "execution" : {
-        "timeout" : 10,
-        "testcase_folder" : "testcase"
-    }
+    "java" : "C:/Program Files/Java/jdk1.8.0_74/bin/java.exe",
+    "ant_home" : "D:/Server/Tomcat 8.0/webapps/JOJS/WEB-INF/lib/apache-ant-1.9.6",
+    "testcase_dir" : "D:/Server/Tomcat 8.0/webapps/JOJS/WEB-INF/testcase",
+    "exec_timeout" : 5
 }
