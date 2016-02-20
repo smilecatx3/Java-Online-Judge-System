@@ -1,5 +1,7 @@
 bak/
 temp/
+**/*ant*/
+**/WEB-INF/testcase/
 
 *.jar
 *.class
@@ -7,6 +9,9 @@ temp/
 *.gif
 *.jpg
 *.ico
+
+403.html
+404.html
 
 # Intellij Idea project files
 .idea/

@@ -27,7 +27,7 @@
 			font-size: 20px;
 		}
 		hr { 
-			height: 12px; border: 0; box-shadow: inset 0 12px 12px -12px #48BB1E;
+			height: 12px; border: 0; box-shadow: inset 0 12px 12px -12px #2CCC17;
 		}
 	</style>
 	<script type="text/javascript" src="js/prototype.js"></script>
@@ -43,16 +43,18 @@
 </head>	
 <body link="blue" vlink="blue" onresize="setIFrameHeight();">
 
-<font style="font-family:Lucida Sans Unicode; font-size:32px; font-weight:bold; text-shadow:3px 3px 3px #cccccc;"> Java Homework Online Judge System </font>
+<font style="font-family:Lucida Sans Unicode; font-size:32px; font-weight:bold; text-shadow:3px 3px 3px #cccccc;"> Java Online Judge System </font>
 <p>
 
 <form enctype="multipart/form-data" method="POST" action="judge.jsp" target="judge">
 	<select id="hwID" name="hwID" class="select_hwID">
-		<option value="hw1" selected>hw1</option>
+		<option value="demo1" selected>demo1</option>
+		<option value="demo2">demo2</option>
+		<option value="demo3">demo3</option>
 	</select>　　
 	Student ID: <input type="text" id="studentID" name="studentID" />　　
 	<select id="mode" name="mode">
-		<option value="normal">normal</option>
+		<option value="standard">standard</option>
 		<option value="stdin">stdin</option>
 	</select>　　
 	<input type="file" name="file" size="30" accept=".zip" style="border-color:#31BAFA; border-width:1px; border-style:ridge;" />　　

@@ -1,4 +1,4 @@
-package tw.edu.ncku.csie.selab.jojs;
+package tw.edu.ncku.csie.selab.jojs.util;
 
 import org.apache.commons.io.FileUtils;
 

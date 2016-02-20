@@ -5,16 +5,23 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 
+import tw.edu.ncku.csie.selab.jojs.util.Executor;
+
 public class CompilationTask {
-    private static final String ANT_PATH = JOJS.getConfig("compilation").getString("ant_path");
-    private static String BUILD_FILE_TEMPLATE = null;
+    private static String ANT;
+    private static String BUILD_FILE_TEMPLATE;
     private File srcFolder, binFolder;
 
     static {
         try {
+            File ant = new File(JOJS.CONFIG.getString("ant_home"), "lib/ant-launcher.jar");
+            if (!ant.exists())
+                throw new FileNotFoundException(String.format("Cannot find the file \"%s\"", ant.getAbsolutePath()));
+            ANT = ant.getAbsolutePath();
             BUILD_FILE_TEMPLATE = IOUtils.toString(JOJS.class.getResourceAsStream("/data/build.xml"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -26,11 +33,11 @@ public class CompilationTask {
         this.binFolder = binFolder;
     }
 
-    public void run() throws Exception {
-        String[] command = {ANT_PATH, "-buildfile", generateBuildFile()};
-        String output = TaskExecutor.execute(command);
+    public void execute() throws IOException, JudgeException {
+        String[] command = {JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-cp", ANT, "org.apache.tools.ant.launch.Launcher", "-buildfile", generateBuildFile()};
+        String output = Executor.execute(command, null);
         if (output.contains("BUILD FAILED"))
-            throw new Exception("ERROR: Compilation failed. \n\n" + getErrorMessage(output));
+            throw new JudgeException("Compilation failed. \n\n" + getErrorMessage(output));
     }
 
     private String generateBuildFile() throws IOException {
@@ -47,7 +54,21 @@ public class CompilationTask {
     }
 
     private String getErrorMessage(String output) {
-        return output.substring(output.indexOf(binFolder.getAbsolutePath())+ binFolder.getAbsolutePath().length(), output.lastIndexOf("BUILD FAILED"))
-                .replace("[javac] ", "").replace(srcFolder.getAbsolutePath()+File.separator, "");
+        String srcPath = srcFolder.getAbsolutePath() + File.separator;
+        String binPath = binFolder.getAbsolutePath();
+        if (output.contains(binPath)) {
+            StringBuilder result = new StringBuilder();
+            String[] lines = output.split("\n");
+            for (String line : lines) {
+                if (!line.contains("[javac]") || line.contains(binPath))
+                    continue;
+                if (line.contains(srcPath))
+                    line = line.replace(srcPath, "").replace("\\", "/");
+                result.append(line.replace("[javac]", "")).append("\n");
+            }
+            return result.toString();
+        } else {
+            return output;
+        }
     }
 }

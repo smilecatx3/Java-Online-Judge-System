@@ -51,9 +51,11 @@
 	}
 	
 	void printErrorMessage(JspWriter out, String msg) throws IOException {
-		out.println("<pre> <font color='red'>");
+		out.println(String.format(
+				"<pre style='font-size:20px; color:red; text-align:%s; font-family: Consolas;'>", 
+				msg.contains("Compilation failed") ? "left" : "center"));
 		out.println(msg);
-		out.println("</font></pre>");
+		out.println("</pre>");
 		out.flush();
 	}
 %>
@@ -78,11 +80,10 @@
 	}
 	String hwID = parameters.get("hwID").getString();
 	String studentID = parameters.get("studentID").getString();
-	boolean stdin = parameters.get("mode").equals("stdin") ? true : false;
+	ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
 	
+	Judger judger = new Judger(hwID, studentID);
 	try {
-		Judger judger = new Judger(hwID, studentID);
-		
 		// Upload 
 		setStatus(out, "Uploading ...");
 		File zipFile = new File(judger.getWorkingDirectory(), parameters.get("file").getName());
@@ -94,31 +95,35 @@
 		
 		// Execute
 		setStatus(out, "Executing ...");
-		JudgeResult judgeResult = judger.execute(stdin);
+		JudgeResult judgeResult = judger.execute(mode);
 		
 		// Show results
-		setStatus(out, String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(elpased time: %.0f ms)</font>", judgeResult.getScore(), judgeResult.getRuntime()));
-		out.print("<table>");
-		out.print("<tr>  <td align='center' valign='top'> # </td>  <td align='center'> Result </td>  <td align='center'> Testcase </td>  <td align='center'> Your Output </td>  <td align='center'> Expected Output </td>  </tr>");
-		
 		ExecutionResult[] results = judgeResult.getResults();
 		JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
         JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
+		
+		setStatus(out, String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(elpased time: %.0f ms)</font>", judgeResult.getScore(), judgeResult.getRuntime()));
+		out.print("<table>");
+		out.print("<tr>  <td align='center' valign='top'> # </td>  <td align='center'> Result </td>  <td align='center'> Input </td>  <td align='center'> Your Output </td>  <td align='center'> Expected Output </td>  </tr>");
 		for (int i=0; i<results.length; i++) {
 			ExecutionResult result = results[i];
 			out.print(String.format("<tr>  <td align='center' valign='top'> %s </td>  <td align='center' valign='top'> %s </td>  <td valign='top' class='td'> %s </td>  <td valign='top' class='td'> %s </td>  <td valign='top' class='td'> %s </td>  </tr>", 
 					String.format("<font face='Comic Sans MS'>%d</font>", i+1),
 					String.format("<b><font color='%s'>%s</font></b>", result.isPassed()?"green":"red", result.isPassed()?"Accepted":"Incorrect"),
-					String.format("<pre>%s</pre>", inputs.get(i).toString().replaceAll(String.format("%s|\"", Pattern.quote("[")), "").replaceAll(String.format(",|%s", Pattern.quote("]")), "\n")),
-					String.format("<pre>%s</pre>", result.getAnswer()),
-					String.format("<pre>%s</pre>", outputs.get(i).toString().replaceAll(String.format("%s|\"", Pattern.quote("[")), "").replaceAll(String.format(",|%s", Pattern.quote("]")), "\n"))
+					(inputs.length() > 0) ? String.format("<pre style='font-family: Consolas;'>%s</pre>", inputs.get(i).toString().replaceAll(String.format("%s|\"", Pattern.quote("[")), "").replaceAll(String.format(",|%s", Pattern.quote("]")), "\n")) : "",
+					String.format("<pre style='font-family: Consolas;'>%s</pre>", result.getAnswer()),
+					String.format("<pre style='font-family: Consolas;'>%s</pre>", outputs.get(i).toString().replaceAll(String.format("%s|\"", Pattern.quote("[")), "").replaceAll(String.format(",|%s", Pattern.quote("]")), "\n"))
 			));
 		}
 		out.print("</table>");
+	} catch (JudgeException e) {
+		printErrorMessage(out, e.getMessage());
 	} catch (Exception e) {
-		out.println("<pre> <font color='red'>");
+		out.println("<pre style='color:red; text-align:left;'>");
 		e.printStackTrace(new PrintWriter(out));
-		out.println("</font></pre>");
+		out.println("</pre>");
+	} finally {
+		judger.cleanWorkingDirectory();
 	}
 %>
 
