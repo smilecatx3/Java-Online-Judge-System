@@ -81,7 +81,8 @@ public class Judger {
 
     public void cleanWorkingDirectory() {
         try {
-            FileUtils.forceDelete(workingDirectory);
+            if (workingDirectory.exists())
+                FileUtils.forceDelete(workingDirectory);
         } catch (IOException e) {
             e.printStackTrace();
         }

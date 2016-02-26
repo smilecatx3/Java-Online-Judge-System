@@ -6,6 +6,7 @@
 <%@ page import = "org.apache.commons.fileupload.*" %>
 <%@ page import = "org.apache.commons.fileupload.servlet.*" %>
 <%@ page import = "org.apache.commons.fileupload.disk.*" %>
+<%@ page import = "org.apache.commons.lang3.*" %>
 <%@ page import = "org.json.*" %>
 <%@ page import = "tw.edu.ncku.csie.selab.jojs.*" %>
 
@@ -53,10 +54,17 @@
 	void printErrorMessage(JspWriter out, String msg) throws IOException {
 		out.println(String.format(
 				"<pre style='font-size:20px; color:red; text-align:%s; font-family: Consolas;'>", 
-				msg.contains("Compilation failed") ? "left" : "center"));
+				msg.contains("Please fill all blanks") ? "center" : "left"));
 		out.println(msg);
 		out.println("</pre>");
 		out.flush();
+	}
+	
+	String printJsonArray(JSONArray array) {
+		StringBuilder result = new StringBuilder();
+		for (int i=0; i<array.length(); i++)
+			result.append(array.getString(i)).append("\n");
+		return StringEscapeUtils.escapeHtml4(result.toString());
 	}
 %>
 
@@ -82,8 +90,9 @@
 	String studentID = parameters.get("studentID").getString();
 	ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
 	
-	Judger judger = new Judger(hwID, studentID);
+	Judger judger = null;
 	try {
+		judger = new Judger(hwID, studentID);
 		// Upload 
 		setStatus(out, "Uploading ...");
 		File zipFile = new File(judger.getWorkingDirectory(), parameters.get("file").getName());
@@ -100,7 +109,7 @@
 		// Show results
 		ExecutionResult[] results = judgeResult.getResults();
 		JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
-        JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
+		JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
 		
 		setStatus(out, String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(elpased time: %.0f ms)</font>", judgeResult.getScore(), judgeResult.getRuntime()));
 		out.print("<table>");
@@ -110,9 +119,9 @@
 			out.print(String.format("<tr>  <td align='center' valign='top'> %s </td>  <td align='center' valign='top'> %s </td>  <td valign='top' class='td'> %s </td>  <td valign='top' class='td'> %s </td>  <td valign='top' class='td'> %s </td>  </tr>", 
 					String.format("<font face='Comic Sans MS'>%d</font>", i+1),
 					String.format("<b><font color='%s'>%s</font></b>", result.isPassed()?"green":"red", result.isPassed()?"Accepted":"Incorrect"),
-					(inputs.length() > 0) ? String.format("<pre style='font-family: Consolas;'>%s</pre>", inputs.get(i).toString().replaceAll(String.format("%s|\"", Pattern.quote("[")), "").replaceAll(String.format(",|%s", Pattern.quote("]")), "\n")) : "",
+					(inputs.length() > 0) ? String.format("<pre style='font-family: Consolas;'>%s</pre>", printJsonArray(inputs.getJSONArray(i))) : "",
 					String.format("<pre style='font-family: Consolas;'>%s</pre>", result.getAnswer()),
-					String.format("<pre style='font-family: Consolas;'>%s</pre>", outputs.get(i).toString().replaceAll(String.format("%s|\"", Pattern.quote("[")), "").replaceAll(String.format(",|%s", Pattern.quote("]")), "\n"))
+					String.format("<pre style='font-family: Consolas;'>%s</pre>", printJsonArray(outputs.getJSONArray(i)))
 			));
 		}
 		out.print("</table>");

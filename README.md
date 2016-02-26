@@ -6,6 +6,7 @@
 #### Required Libraries
 
 - [Apache Commons FileUpload] (http://commons.apache.org/proper/commons-fileupload/) (for online judgement)
+- [Apache Commons Lang] (http://commons.apache.org/proper/commons-lang/) (for online judgement)
 - [Apache Commons IO] (http://commons.apache.org/proper/commons-io/)
 - [JSON] (https://github.com/douglascrockford/JSON-java)
 - [Zip4j] (http://www.lingala.net/zip4j/)
@@ -55,6 +56,7 @@ For example, the following json file has two testcases. Each testcase has an inp
 }
 ```
   
+Note that you should escape the special characters such as '"' or '\n'.
 You can use ```TestcaseCreator``` in jojs.jar to create a testcase file for convenience.  
 Usage: ```java -cp jojs.jar tw.edu.ncku.csie.selab.jojs.util.TestcaseCreator INPUT_FILE OUTPUT_FILE INPUT_PER_TESTCASE OUTPUT_PER_TESTCASE```
 

@@ -54,7 +54,7 @@ public class ExecutionTask implements Callable<JudgeResult> {
                 JSONArray input = inputs.getJSONArray(i);
                 if (mode == Mode.STANDARD) {
                     for (int j = 0; j < input.length(); j++)
-                        command.add(input.getString(j));
+                        command.add(input.getString(j).replace("\"", "\\\""));
                 } else if (mode == Mode.STDIN) {
                     inputFile = createInputFile(input);
                 }
