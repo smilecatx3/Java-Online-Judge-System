@@ -30,39 +30,71 @@
 			height: 12px; border: 0; box-shadow: inset 0 12px 12px -12px #2CCC17;
 		}
 	</style>
-	<script type="text/javascript" src="js/prototype.js"></script>
-	<script type="text/javascript" >
-		function setIFrameHeight() {
-			var iFrame = document.getElementById("judge");
-			var frameTop = iFrame.getBoundingClientRect().top;
-			var bodyBottom = document.body.getBoundingClientRect().bottom;
-			var height = bodyBottom - frameTop - 50;
-			iFrame.setStyle({height: height+"px"});
-		}
-	</script>
 </head>	
 <body link="blue" vlink="blue" onresize="setIFrameHeight();">
 
+<script type="text/javascript" src="js/prototype.js"></script>
+<script type="text/javascript" >
+	function setIFrameHeight() {
+		var iFrame = document.getElementById("judge");
+		var frameTop = iFrame.getBoundingClientRect().top;
+		var bodyBottom = document.body.getBoundingClientRect().bottom;
+		var height = bodyBottom - frameTop - 50;
+		iFrame.setStyle({height: height+"px"});
+	}
+	
+	function validateForm() {
+		var form = document.forms["form"];
+		var button = document.getElementById("btn_submit");
+		var studentID = form["studentID"].value;
+		var file = form["file"].value;
+		if ((studentID != null) && (file != null) && (studentID.length==9) && (file.length > 0)) {
+			button.removeAttribute("disabled");
+			button.className = "btn_submit";
+		} else {
+			button.setAttribute("disabled", true);
+			button.className = "btn_disabled";
+		}
+	}
+	
+	function submitForm() {
+		var form = document.forms["form"];
+		var button = document.getElementById("btn_submit");
+		
+		// Disable submit button for a while
+		button.setAttribute("disabled", true);
+		button.className = "btn_disabled";
+		setTimeout(function() {
+				button.removeAttribute("disabled");
+				button.className = "btn_submit";
+			}, 1000);
+		// Submit form
+		form.action = "judge.jsp";
+	}
+</script>
+	
 <font style="font-family:Lucida Sans Unicode; font-size:32px; font-weight:bold; text-shadow:3px 3px 3px #cccccc;"> Java Online Judge System </font>
 <p>
 
-<form enctype="multipart/form-data" method="POST" action="judge.jsp" target="judge">
+<form id="form" name="form" enctype="multipart/form-data" method="POST" onsubmit="submitForm()" target="judge">
 	<select id="hwID" name="hwID" class="select_hwID">
-		<option value="demo1" selected>demo1</option>
+		<option value="hw1" selected>hw1</option>
+		<option value="demo1">demo1</option>
 		<option value="demo2">demo2</option>
 		<option value="demo3">demo3</option>
 	</select>　　
-	Student ID: <input type="text" id="studentID" name="studentID" />　　
+	Student ID: <input type="text" id="studentID" name="studentID" onchange="validateForm()" />　　
 	<select id="mode" name="mode">
 		<option value="standard">standard</option>
 		<option value="stdin">stdin</option>
 	</select>　　
-	<input type="file" name="file" size="30" accept=".zip" style="border-color:#31BAFA; border-width:1px; border-style:ridge;" />　　
-	<input type="submit" value="SUBMIT" class="btn_submit" />
+	<input type="file" name="file" size="30" accept=".zip" onchange="validateForm()" style="border-color:#31BAFA; border-width:1px; border-style:ridge;" />　　
+	<input id="btn_submit" type="submit" value="SUBMIT" class="btn_disabled" disabled="true" />
 </form>
 <hr>
 
-<iframe id="judge" name="judge" onload="setIFrameHeight();" width="90%" style="border:0px ridge #F4E34F;" />
+<div id="msg"> </div>
+<iframe id="judge" name="judge" onload="setIFrameHeight();" width="85%" style="border:0px ridge #F4E34F;" />
 
 </body>
 </html>

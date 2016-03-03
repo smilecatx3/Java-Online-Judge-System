@@ -1,20 +1,20 @@
 package tw.edu.ncku.csie.selab.jojs;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.filechooser.FileSystemView;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class JOJS {
     public static final JSONObject CONFIG;
     public static final String JAVA;
+    public static ExecutorService service;
 
     static {
         JSONObject temp = null;
@@ -26,10 +26,36 @@ public class JOJS {
         }
         CONFIG = temp;
         JAVA = CONFIG.getString("java");
+        service = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {service.shutdownNow();}));
+    }
+
+    public synchronized static Future<JudgeResult> judge(Judgement judgement) throws JudgeException, ExecutionException, InterruptedException {
+        return service.submit(() -> {
+            Judger judger = new Judger(judgement.hwID, judgement.studentID);
+            try {
+                File zipFile = null;
+                if (judgement instanceof OnlineJudgement) {
+                    FileItem fileItem = ((OnlineJudgement) judgement).fileItem;
+                    zipFile = new File(judger.getWorkingDirectory(), fileItem.getName());
+                    fileItem.write(zipFile);
+                } else {
+                    zipFile = ((OfflineJudgement) judgement).file;
+                }
+
+                judgement.reportProgress(0.5, "Compiling ...");
+                judger.compile(zipFile);
+                return judger.execute(judgement); // TODO need refactoring
+            } finally {
+                judger.cleanWorkingDirectory();
+            }
+        });
     }
 
 
 
+    /* TODO
     public static void main(String args[]) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -60,7 +86,7 @@ public class JOJS {
                 Judger judger = new Judger(hwID, studentID);
                 try {
                     judger.compile(file);
-                    JudgeResult judgeResult = judger.execute(mode);
+                    JudgeResult judgeResult = judger.execute(null);
                     summaryBuilder.append(studentID).append(",").append(judgeResult.getScore()).append(",");
                     ExecutionResult[] executionResults = judgeResult.getResults();
                     for (int j=0; j<executionResults.length; j++)
@@ -82,4 +108,5 @@ public class JOJS {
         }
         FileUtils.writeStringToFile(summary, summaryBuilder.toString());
     }
+    */
 }

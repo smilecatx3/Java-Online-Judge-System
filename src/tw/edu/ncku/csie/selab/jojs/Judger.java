@@ -21,7 +21,7 @@ public class Judger {
     private File workingDirectory;
     private File srcFolder, binFolder;
 
-    public Judger(String hwID, String studentID) throws JudgeException, IOException {
+    Judger(String hwID, String studentID) throws JudgeException, IOException {
         if (!studentID.matches("[A-Z][0-9]{8}"))
             throw new JudgeException("The student ID is invalid: " + studentID);
 
@@ -51,7 +51,7 @@ public class Judger {
         new CompilationTask(srcFolder, binFolder).execute();
     }
 
-    public JudgeResult execute(ExecutionTask.Mode mode) throws JudgeException, IOException, ExecutionException, InterruptedException {
+    public JudgeResult execute(Judgement judgement) throws JudgeException, IOException, ExecutionException, InterruptedException {
         // Get main class (entry point) to execute
         File manifest = new File(workingDirectory, "META-INF/MANIFEST.MF");
         if (!manifest.exists())
@@ -66,7 +66,7 @@ public class Judger {
         // Execute the program with time limit
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<JudgeResult> future = executor.submit(new ExecutionTask(new File(TESTCASE_DIR, hwID+".json"), binFolder, entryPoint, mode));
+            Future<JudgeResult> future = executor.submit(new ExecutionTask(new File(TESTCASE_DIR, hwID+".json"), binFolder, entryPoint, judgement));
             return future.get(TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             throw new JudgeException(String.format("Your program exceeded time limit %d seconds.", TIMEOUT));

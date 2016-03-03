@@ -10,10 +10,10 @@
 	-moz-border-radius: 28;
 	border-radius: 28px;
 	text-shadow: 3px 3px 1px #666666;
-	font-family: Georgia;
+	font-family: Lucida Console;
 	color: #ffffff;
 	font-size: 18px;
-	padding: 5px 12px 5px 12px;
+	padding: 6px 12px 6px 12px;
 	text-decoration: none;
 }
 .btn_submit:hover {
@@ -23,5 +23,17 @@
 	background-image: -ms-linear-gradient(top, #279de6, #249ae3);
 	background-image: -o-linear-gradient(top, #279de6, #249ae3);
 	background-image: linear-gradient(to bottom, #279de6, #249ae3);
+	text-decoration: none;
+}
+.btn_disabled {
+	background: #7C7C7C;
+	-webkit-border-radius: 28;
+	-moz-border-radius: 28;
+	border-radius: 28px;
+	text-shadow: 3px 3px 1px #666666;
+	font-family: Lucida Console;
+	color: #C9C9C9;
+	font-size: 18px;
+	padding: 6px 12px 6px 12px;
 	text-decoration: none;
 }

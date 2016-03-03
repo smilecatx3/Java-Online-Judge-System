@@ -30,12 +30,14 @@ public class ExecutionTask implements Callable<JudgeResult> {
     private File binFolder;
     private String entryPoint;
     private Mode mode;
+    private Judgement judgement;
 
-    public ExecutionTask(File testcase, File binFolder, String entryPoint, Mode mode) throws IOException {
+    public ExecutionTask(File testcase, File binFolder, String entryPoint, Judgement judgement) throws IOException {
         this.testcase = new JSONObject(FileUtils.readFileToString(testcase));
         this.binFolder = binFolder;
         this.entryPoint = entryPoint;
-        this.mode = mode;
+        this.mode = judgement.mode;
+        this.judgement = judgement;
     }
 
     @Override
@@ -46,6 +48,8 @@ public class ExecutionTask implements Callable<JudgeResult> {
 
         double elapsedTime = 0;
         for (int i=0; i<outputs.length(); i++) {
+            judgement.reportProgress(0.5+((i+1.0)/outputs.length())*0.5, String.format("Executing ... (%d/%d)", i+1, outputs.length()));
+
             // Construct command
             File inputFile = null; // stdin
             List<String> command = new ArrayList<>();

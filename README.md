@@ -25,6 +25,7 @@ Firstly, you should configure the program settings in **jojs.jar/data/config.jso
 - **ant_home** is the path to the Apache Ant home directory  
 - **testcase_dir** is the path to the directory where the test case files are put here  
 - **timeout** is the execution timeout (in seconds)  
+- **max_thread** is the maximum number of simultaneous judgements  
 
 <br/>
 
@@ -99,6 +100,8 @@ You can refer to [demo](https://drive.google.com/folderview?id=0B6go6tO3TUxuVi16
 <br/>
   
 ### Offline Judgement
+
+(Note: This feature is disabled for v2.0.0)
 
 Execute the following command with all the required libraries put in the same folder.  
 ```java -jar jojs.jar HW_ID MODE(standard|stdin)```  

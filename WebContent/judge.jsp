@@ -3,6 +3,7 @@
 <%@ page import = "java.io.*" %>
 <%@ page import = "java.util.*" %>
 <%@ page import = "java.util.regex.*" %>
+<%@ page import = "java.util.concurrent.*" %>
 <%@ page import = "org.apache.commons.fileupload.*" %>
 <%@ page import = "org.apache.commons.fileupload.servlet.*" %>
 <%@ page import = "org.apache.commons.fileupload.disk.*" %>
@@ -26,7 +27,7 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
-		table td, table tr{
+		table td, table tr {
 			border: 1px solid #8BABEB;
 			padding: 5px;
 		}
@@ -35,31 +36,27 @@
 			font-family: Lucida Sans Unicode;
 		}
 		.td {
-			max-width:450px; 
+			max-width:500px; 
 			word-wrap: break-word;
 		}
 		pre {
-			font-size:16;
+			font-size: 16px;
+			font-family: Consolas;
+		}
+		.progress {
+            height: 250px;
+			font-size: 40px;
+        }
+		.progress > svg {
+			height: 100%;
+			display: block;
 		}
 	</style>
+	<script type="text/javascript" src="js/progressbar.js"></script>
 </head>
 <body>
 
 <%!
-	void setStatus(JspWriter out, String text) throws IOException {
-		out.println(String.format("<script> document.getElementById(\"status\").innerHTML = \"%s<p>\"; </script>", text));
-		out.flush();
-	}
-	
-	void printErrorMessage(JspWriter out, String msg) throws IOException {
-		out.println(String.format(
-				"<pre style='font-size:20px; color:red; text-align:%s; font-family: Consolas;'>", 
-				msg.contains("Please fill all blanks") ? "center" : "left"));
-		out.println(msg);
-		out.println("</pre>");
-		out.flush();
-	}
-	
 	String printJsonArray(JSONArray array) {
 		StringBuilder result = new StringBuilder();
 		for (int i=0; i<array.length(); i++)
@@ -68,20 +65,63 @@
 	}
 %>
 
-<div id="status" style="font-size:20px;"> </div>
+<script>
+	var progressCircle;
+	
+	function drawProgressCircle() {
+		progressCircle = new ProgressBar.Circle('#progress', {
+			color: '#15CB08',
+			strokeWidth: 3,
+			trailWidth: 1,
+			duration: 500,
+			text: {
+				value: '0',
+				style : {
+					color: '#4ACF1E',
+					position: 'absolute',
+					left: '50%',
+					top: '50%',
+					padding: 0,
+					margin: 0
+				}
+			},
+			step: function(state, bar) {
+				bar.setText((bar.value() * 100).toFixed(0)+"%");
+			}
+		});
+	}
+	
+	function removeProgressCircle() {
+		// TODO may need delete object
+		var div = document.getElementById('progress');
+		if (div) {
+			div.parentNode.removeChild(div);
+		}
+	}
+	
+	function setStatus(message) {
+		document.getElementById("status").innerHTML = message;
+	}
+
+	function setProgress(progress, message) {
+		var speed = message.includes("Compiling") ? 1000 : 200;
+		setStatus(message);
+		progressCircle.animate(progress, {duration: speed});
+	}
+</script>
+	
+<div id="status" style="font-size: 20px;"> </div>
+<p>
+<div class="progress" id="progress"> </div>
+<p>
 
 <%
 	// Get POST parameters
 	Map<String, FileItem> parameters = new HashMap<>();
 	try {
 		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-		for (FileItem item : items) {
-			if (item.getSize() == 0) {
-				printErrorMessage(out, "Please fill all blanks.");
-				return;
-			}
+		for (FileItem item : items)
 			parameters.put(item.getFieldName(), item);
-		}
 	} catch (FileUploadException e) {
 		response.sendRedirect("403.html");
 		return;
@@ -90,30 +130,24 @@
 	String studentID = parameters.get("studentID").getString();
 	ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
 	
-	Judger judger = null;
-	try {
-		judger = new Judger(hwID, studentID);
-		// Upload 
-		setStatus(out, "Uploading ...");
-		File zipFile = new File(judger.getWorkingDirectory(), parameters.get("file").getName());
-		parameters.get("file").write(zipFile);
+	out.print("<script> drawProgressCircle(); </script>");
+	out.print("<script> setProgress(0, \"Pending ...\"); </script>");
+	out.flush();
 	
-		// Compile
-		setStatus(out, "Compiling ...");
-		judger.compile(zipFile);
-		
-		// Execute
-		setStatus(out, "Executing ...");
-		JudgeResult judgeResult = judger.execute(mode);
+	try {
+		JudgeResult judgeResult = JOJS.judge(new OnlineJudgement(hwID, studentID, mode, parameters.get("file"), out)).get();
+		out.print("<script> removeProgressCircle(); </script>");
 		
 		// Show results
 		ExecutionResult[] results = judgeResult.getResults();
 		JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
 		JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
 		
-		setStatus(out, String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(elpased time: %.0f ms)</font>", judgeResult.getScore(), judgeResult.getRuntime()));
+		out.print(String.format("<script> setStatus(\"%s\"); </script>", 
+				String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(Runtime: %.0f ms)</font>", 
+				judgeResult.getScore(), judgeResult.getRuntime())));
 		out.print("<table>");
-		out.print("<tr>  <td align='center' valign='top'> # </td>  <td align='center'> Result </td>  <td align='center'> Input </td>  <td align='center'> Your Output </td>  <td align='center'> Expected Output </td>  </tr>");
+		out.print("<tr>  <td align='center' valign='top'> # </td>  <td align='center'> Result </td>  <td align='center'> Input </td>  <td align='center'> Your Answer </td>  <td align='center'> Expected Answer </td>  </tr>");
 		for (int i=0; i<results.length; i++) {
 			ExecutionResult result = results[i];
 			out.print(String.format("<tr>  <td align='center' valign='top'> %s </td>  <td align='center' valign='top'> %s </td>  <td valign='top' class='td'> %s </td>  <td valign='top' class='td'> %s </td>  <td valign='top' class='td'> %s </td>  </tr>", 
@@ -125,14 +159,13 @@
 			));
 		}
 		out.print("</table>");
-	} catch (JudgeException e) {
-		printErrorMessage(out, e.getMessage());
 	} catch (Exception e) {
-		out.println("<pre style='color:red; text-align:left;'>");
-		e.printStackTrace(new PrintWriter(out));
+		out.println("<pre style='color:red; font-family:Consolas; text-align:left; padding-left:300px; padding-right:300px;'>");
+		if (e.getCause() instanceof JudgeException)
+			out.println(e.getMessage());
+		else
+			e.printStackTrace(new PrintWriter(out, true));
 		out.println("</pre>");
-	} finally {
-		judger.cleanWorkingDirectory();
 	}
 %>
 
