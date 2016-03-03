@@ -53,7 +53,7 @@ public class ExecutionTask implements Callable<JudgeResult> {
             // Construct command
             File inputFile = null; // stdin
             List<String> command = new ArrayList<>();
-            Collections.addAll(command, JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-cp", binFolder.getAbsolutePath(), entryPoint);
+            Collections.addAll(command, JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-Djava.security.manager", "-cp", binFolder.getAbsolutePath(), entryPoint);
             if (inputs.length() > 0) {
                 JSONArray input = inputs.getJSONArray(i);
                 if (mode == Mode.STANDARD) {
