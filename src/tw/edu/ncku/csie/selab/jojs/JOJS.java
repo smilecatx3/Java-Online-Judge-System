@@ -39,7 +39,7 @@ public class JOJS {
                 // TODO Need refactoring
                 if (judgement instanceof OnlineJudgement) {
                     FileItem fileItem = ((OnlineJudgement) judgement).fileItem;
-                    zipFile = new File(judger.getWorkingDirectory(), fileItem.getName());
+                    zipFile = new File(judger.getWorkingDirectory(), new File(fileItem.getName()).getName());
                     fileItem.write(zipFile);
                 } else {
                     zipFile = ((OfflineJudgement) judgement).file;
