@@ -36,6 +36,7 @@ public class JOJS {
             Judger judger = new Judger(judgement.hwID, judgement.studentID);
             try {
                 File zipFile = null;
+                // TODO Need refactoring
                 if (judgement instanceof OnlineJudgement) {
                     FileItem fileItem = ((OnlineJudgement) judgement).fileItem;
                     zipFile = new File(judger.getWorkingDirectory(), fileItem.getName());
@@ -44,7 +45,7 @@ public class JOJS {
                     zipFile = ((OfflineJudgement) judgement).file;
                 }
 
-                judgement.reportProgress(0.5, "Compiling ...");
+                judgement.reportProgress(0.5, "Compiling");
                 judger.compile(zipFile);
                 return judger.execute(judgement); // TODO need refactoring
             } finally {

@@ -8,51 +8,13 @@
 <%@ page import = "org.apache.commons.fileupload.servlet.*" %>
 <%@ page import = "org.apache.commons.fileupload.disk.*" %>
 <%@ page import = "org.apache.commons.lang3.*" %>
+<%@ page import = "org.apache.commons.lang3.text.*" %>
 <%@ page import = "org.json.*" %>
 <%@ page import = "tw.edu.ncku.csie.selab.jojs.*" %>
 
 <html>
 <head>
-	<style type="text/css">
-		html {
-			height: 100%; 
-			text-align: center;
-		}
-		body {
-			text-align: center;
-			font-size:16;
-		}
-		table {
-			border: 1px solid #0755F2;
-			margin-left: auto;
-			margin-right: auto;
-		}
-		table td, table tr {
-			border: 1px solid #8BABEB;
-			padding: 5px;
-		}
-		table tr:first-child td {
-			font-weight: bold;
-			font-family: Lucida Sans Unicode;
-		}
-		.td {
-			max-width:500px; 
-			word-wrap: break-word;
-		}
-		pre {
-			font-size: 16px;
-			font-family: Consolas;
-		}
-		.progress {
-            height: 250px;
-			font-size: 40px;
-        }
-		.progress > svg {
-			height: 100%;
-			display: block;
-		}
-	</style>
-	<script type="text/javascript" src="js/progressbar.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/judge.css">
 </head>
 <body>
 
@@ -65,55 +27,16 @@
 	}
 %>
 
-<script>
-	var progressCircle;
-	
-	function drawProgressCircle() {
-		progressCircle = new ProgressBar.Circle('#progress', {
-			color: '#15CB08',
-			strokeWidth: 3,
-			trailWidth: 1,
-			duration: 500,
-			text: {
-				value: '0',
-				style : {
-					color: '#4ACF1E',
-					position: 'absolute',
-					left: '50%',
-					top: '50%',
-					padding: 0,
-					margin: 0
-				}
-			},
-			step: function(state, bar) {
-				bar.setText((bar.value() * 100).toFixed(0)+"%");
-			}
-		});
-	}
-	
-	function removeProgressCircle() {
-		// TODO may need delete object
-		var div = document.getElementById('progress');
-		if (div) {
-			div.parentNode.removeChild(div);
-		}
-	}
-	
-	function setStatus(message) {
-		document.getElementById("status").innerHTML = message;
-	}
+<script src="js/progressbar.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/judge.js"></script>
 
-	function setProgress(progress, message) {
-		var speed = message.includes("Compiling") ? 1000 : 200;
-		setStatus(message);
-		progressCircle.animate(progress, {duration: speed});
-	}
-</script>
-	
-<div id="status" style="font-size: 20px;"> </div>
-<p>
-<div class="progress" id="progress"> </div>
-<p>
+<div class="status"> 
+	<font style="color:black;">Run Code Status: </font> <span id="status"></span>
+</div>
+<div id="progress" class="progress"></div>
+<div id="judge_error" class="judge_error"></div>
+<div id="judge_result" class="judge_result"></div>
 
 <%
 	// Get POST parameters
@@ -131,19 +54,16 @@
 	ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
 	
 	out.print("<script> drawProgressCircle(); </script>");
-	out.print("<script> setProgress(0, \"Pending ...\"); </script>");
+	out.print("<script> showProgress(0, \"Pending ...\"); </script>");
 	out.flush();
 	
 	try {
 		JudgeResult judgeResult = JOJS.judge(new OnlineJudgement(hwID, studentID, mode, parameters.get("file"), out)).get();
-		out.print("<script> removeProgressCircle(); </script>");
-		
-		// Show results
 		ExecutionResult[] results = judgeResult.getResults();
 		JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
 		JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
 		
-		out.print(String.format("<script> setStatus(\"%s\"); </script>", 
+		out.print(String.format("<script> showJudgeResult(\"%s\"); </script>", 
 				String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(Runtime: %.0f ms)</font>", 
 				judgeResult.getScore(), judgeResult.getRuntime())));
 		out.print("<table>");
@@ -160,12 +80,16 @@
 		}
 		out.print("</table>");
 	} catch (Exception e) {
-		out.println("<pre style='color:red; font-family:Consolas; text-align:left; padding-left:300px; padding-right:300px;'>");
-		if (e.getCause() instanceof JudgeException)
-			out.println(e.getMessage());
-		else
+		if (e.getCause() instanceof JudgeException) {
+			JudgeException ex = (JudgeException) e.getCause();
+			String errorCode = WordUtils.capitalizeFully(ex.getErrorCode().toString(), "_".toCharArray()).replace("_", " ");
+			String message = StringEscapeUtils.escapeHtml4(ex.getMessage()).replace("\r", "").replace("\n", "<br/>");
+			out.print(String.format("<script> showErrorMessage('%s', '%s'); </script>", errorCode, message));
+		} else {
+			out.println("<pre style='color:red; font-family:Consolas; text-align:left; padding-left:300px; padding-right:300px;'>");
 			e.printStackTrace(new PrintWriter(out, true));
-		out.println("</pre>");
+			out.println("</pre>");
+		}
 	}
 %>
 

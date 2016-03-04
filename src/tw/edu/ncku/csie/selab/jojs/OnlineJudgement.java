@@ -17,6 +17,6 @@ public class OnlineJudgement extends Judgement {
 
     @Override
     public void reportProgress(double progress, String message) {
-        writer.println(String.format("<script> setProgress(%f, \"%s\"); </script>", progress, message));
+        writer.println(String.format("<script> showProgress(%f, \"%s\"); </script>", progress, message));
     }
 }

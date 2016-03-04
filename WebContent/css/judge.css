@@ -1,0 +1,71 @@
+html {
+	height: 100%; 
+	text-align: center;
+}
+body {
+	text-align: center;
+	font-size:16;
+}
+table {
+	border: 1px solid #0755F2;
+	margin-left: auto;
+	margin-right: auto;
+}
+table td, table tr {
+	border: 1px solid #8BABEB;
+	padding: 5px;
+}
+table tr:first-child td {
+	font-weight: bold;
+	font-family: Lucida Sans Unicode;
+}
+.td {
+	max-width:500px; 
+	word-wrap: break-word;
+}
+pre {
+	font-size: 16px;
+	font-family: Consolas;
+}
+
+.progress {
+	height: 250px;
+	font-size: 40px;
+	padding: 20px 0px 20px 0px;
+}
+.progress > svg {
+	height: 100%;
+	display: block;
+}
+
+.status {
+	font-family:Lucida Sans Unicode; 
+	font-size: 20px; 
+	padding: 0px 0px 20px 0px;
+}
+
+.judge_error {
+    border-radius: 10px;
+    background: #FFCED7;
+	color: #D50E33;
+	font-family: Consolas;
+	font-size: 16px;
+    padding: 15px 20px 15px 20px;
+	min-width: 600px;
+	max-width: 1000px;
+	white-space: pre-wrap;
+	margin: 0 auto;
+	text-align: left;
+	display: none;
+}
+
+.judge_result {
+    border-radius: 10px;
+    background: #EFEFEF;
+    padding: 15px 20px 15px 20px;
+	min-width: 600px;
+	max-width: 1000px;
+	white-space: pre-wrap;
+	margin: 0 auto;
+	display: none;
+}

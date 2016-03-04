@@ -23,7 +23,7 @@ public class Judger {
 
     Judger(String hwID, String studentID) throws JudgeException, IOException {
         if (!studentID.matches("[A-Z][0-9]{8}"))
-            throw new JudgeException("The student ID is invalid: " + studentID);
+            throw new JudgeException("The student ID is invalid: " + studentID, JudgeException.ErrorCode.INVALID_STUDENT_ID);
 
         this.hwID = hwID;
         this.studentID = studentID;
@@ -42,10 +42,10 @@ public class Judger {
     public void compile(File zipFile) throws JudgeException, IOException, ZipException {
         // Unzip source code
         if (!zipFile.getName().endsWith(String.format("%s.zip", studentID)))
-            throw new JudgeException(printUsage());
+            throw new JudgeException(printInputFormat(), JudgeException.ErrorCode.INVALID_INPUT);
         new ZipFile(zipFile).extractAll(workingDirectory.getAbsolutePath());
         if (!srcFolder.exists())
-            throw new JudgeException(printUsage());
+            throw new JudgeException(printInputFormat(), JudgeException.ErrorCode.INVALID_INPUT);
 
         // Compile
         new CompilationTask(srcFolder, binFolder).execute();
@@ -55,13 +55,13 @@ public class Judger {
         // Get main class (entry point) to execute
         File manifest = new File(workingDirectory, "META-INF/MANIFEST.MF");
         if (!manifest.exists())
-            throw new JudgeException(printUsage());
+            throw new JudgeException(printInputFormat(), JudgeException.ErrorCode.INVALID_INPUT);
         String entryPoint = null;
         for (String line : FileUtils.readFileToString(manifest).replace("\r", "").split("\n"))
             if (line.matches("(Main-Class:)\\s*.+"))
                 entryPoint = line.replace("Main-Class:", "").trim();
         if (entryPoint == null)
-            throw new JudgeException("The Main-Class is not specified.");
+            throw new JudgeException("The Main-Class is not specified.", JudgeException.ErrorCode.NO_MAIN_CLASS);
 
         // Execute the program with time limit
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -69,7 +69,7 @@ public class Judger {
             Future<JudgeResult> future = executor.submit(new ExecutionTask(new File(TESTCASE_DIR, hwID+".json"), binFolder, entryPoint, judgement));
             return future.get(TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            throw new JudgeException(String.format("Your program exceeded time limit %d seconds.", TIMEOUT));
+            throw new JudgeException(String.format("Your program exceeded time limit %d seconds.", TIMEOUT), JudgeException.ErrorCode.TIMEOUT);
         } finally {
             executor.shutdownNow();
         }
@@ -88,8 +88,8 @@ public class Judger {
         }
     }
 
-    private String printUsage() {
-        return String.format("The input file should be \"%s.zip\" with the following structure.\n", studentID) +
+    private String printInputFormat() {
+        return String.format("The input file should be \"%s.zip\" with the following structure.\n\n", studentID) +
                 String.format("%s.zip \n", studentID) +
                 "|- src \n" +
                 "|- META-INF \n" +

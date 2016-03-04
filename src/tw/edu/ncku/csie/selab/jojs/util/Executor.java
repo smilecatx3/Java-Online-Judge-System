@@ -1,9 +1,9 @@
 package tw.edu.ncku.csie.selab.jojs.util;
 
-import java.io.BufferedReader;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class Executor {
 
@@ -12,13 +12,7 @@ public class Executor {
         if (inputFile != null)
             processBuilder.redirectInput(inputFile);
         Process process = processBuilder.start();
-        // Read process output
-        try (BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"))) {
-            StringBuilder outputBuilder = new StringBuilder();
-            String line;
-            while ((line = stdout.readLine()) != null)
-                outputBuilder.append(line).append("\n");
-            return outputBuilder.toString();
-        }
+        return IOUtils.toString(process.getInputStream(), "UTF-8");
     }
+
 }

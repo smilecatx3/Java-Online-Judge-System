@@ -37,7 +37,7 @@ public class CompilationTask {
         String[] command = {JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-cp", ANT, "org.apache.tools.ant.launch.Launcher", "-buildfile", generateBuildFile()};
         String output = Executor.execute(command, null);
         if (output.contains("BUILD FAILED"))
-            throw new JudgeException("Compilation failed. \n\n" + getErrorMessage(output));
+            throw new JudgeException(getErrorMessage(output), JudgeException.ErrorCode.COMPILE_ERROR);
     }
 
     private String generateBuildFile() throws IOException {
@@ -53,6 +53,7 @@ public class CompilationTask {
         return buildFile.getAbsolutePath();
     }
 
+    // TODO trim leading spaces
     private String getErrorMessage(String output) {
         String srcPath = srcFolder.getAbsolutePath() + File.separator;
         String binPath = binFolder.getAbsolutePath();
