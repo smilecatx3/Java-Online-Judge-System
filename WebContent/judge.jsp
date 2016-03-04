@@ -34,9 +34,9 @@
 <div class="status"> 
 	<font style="color:black;">Run Code Status: </font> <span id="status"></span>
 </div>
-<div id="progress" class="progress"></div>
-<div id="judge_error" class="judge_error"></div>
-<div id="judge_result" class="judge_result"></div>
+<div id="progress"></div>
+<div id="judge_error"></div>
+<div id="judge_result"></div>
 
 <%
 	// Get POST parameters
@@ -63,9 +63,10 @@
 		JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
 		JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
 		
-		out.print(String.format("<script> showJudgeResult(\"%s\"); </script>", 
-				String.format("<b>Score:</b> <font face='Comic Sans MS' color='#D5841A'> %d </font>　　<font size='3' color='gray'>(Runtime: %.0f ms)</font>", 
-				judgeResult.getScore(), judgeResult.getRuntime())));
+		int base = 20;
+		out.print(String.format("<script> showJudgeResult(%d, %d, %d, %d, %d); </script>", 
+					judgeResult.getNumPassed(), results.length, base, judgeResult.getScore(base), judgeResult.getRuntime()));
+					
 		out.print("<table>");
 		out.print("<tr>  <td align='center' valign='top'> # </td>  <td align='center'> Result </td>  <td align='center'> Input </td>  <td align='center'> Your Answer </td>  <td align='center'> Expected Answer </td>  </tr>");
 		for (int i=0; i<results.length; i++) {

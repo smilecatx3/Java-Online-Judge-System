@@ -5,19 +5,15 @@ import org.json.JSONObject;
 public class JudgeResult {
     private JSONObject testcase;
     private ExecutionResult[] results;
-    private double runtime; // milliseconds
-    private int score = 20; // Basic 20, total 100
+    private long runtime; // milliseconds
+    private int numPassed;
 
     public JudgeResult(JSONObject testcase, ExecutionResult[] results, double runtime) {
         this.testcase = testcase;
         this.results = results;
-        this.runtime = runtime;
-
-        double sum = 0;
-        double scorePerTestcase = (100.0 - score) / results.length;
+        this.runtime = (long) runtime;
         for (ExecutionResult result : results)
-            sum += result.isPassed() ? scorePerTestcase : 0;
-        this.score += Math.ceil(sum);
+            numPassed += result.isPassed() ? 1 : 0;
     }
 
     public JSONObject getTestcase() {
@@ -28,11 +24,17 @@ public class JudgeResult {
         return results;
     }
 
-    public double getRuntime() {
+    public long getRuntime() {
         return runtime;
     }
 
-    public int getScore() {
-        return score;
+    public int getNumPassed() {
+        return numPassed;
+    }
+
+    public int getScore(int base) {
+        if (base < 0 || base > 100)
+            throw new IllegalArgumentException("base should be in the range [0, 100]");
+        return (int)Math.ceil(base + ((double)numPassed/results.length)*(100-base));
     }
 }

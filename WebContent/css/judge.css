@@ -28,23 +28,23 @@ pre {
 	font-family: Consolas;
 }
 
-.progress {
-	height: 250px;
-	font-size: 40px;
-	padding: 20px 0px 20px 0px;
-}
-.progress > svg {
-	height: 100%;
-	display: block;
-}
-
 .status {
-	font-family:Lucida Sans Unicode; 
+	font-family: Lucida Sans Unicode; 
 	font-size: 20px; 
 	padding: 0px 0px 20px 0px;
 }
 
-.judge_error {
+#progress {
+	height: 250px;
+	font-size: 40px;
+	padding: 20px 0px 20px 0px;
+}
+#progress > svg {
+	height: 100%;
+	display: block;
+}
+
+#judge_error {
     border-radius: 10px;
     background: #FFCED7;
 	color: #D50E33;
@@ -59,13 +59,17 @@ pre {
 	display: none;
 }
 
-.judge_result {
+#judge_result {
     border-radius: 10px;
     background: #EFEFEF;
-    padding: 15px 20px 15px 20px;
-	min-width: 600px;
-	max-width: 1000px;
+    padding: 15px 30px 15px 30px;
+	min-width: 300px;
+	max-width: 700px;
 	white-space: pre-wrap;
-	margin: 0 auto;
+	margin: auto;
+	margin-bottom: 30px;
 	display: none;
+	text-align: left;
+	font-family: Lucida Sans Unicode; 
+	font-size: 16px;
 }

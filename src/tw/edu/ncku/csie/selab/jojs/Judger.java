@@ -69,7 +69,7 @@ public class Judger {
             Future<JudgeResult> future = executor.submit(new ExecutionTask(new File(TESTCASE_DIR, hwID+".json"), binFolder, entryPoint, judgement));
             return future.get(TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            throw new JudgeException(String.format("Your program exceeded time limit %d seconds.", TIMEOUT), JudgeException.ErrorCode.TIMEOUT);
+            throw new JudgeException(String.format("Your program exceeded time limit %d seconds.", TIMEOUT), JudgeException.ErrorCode.TIME_LIMIT_EXCEEDED);
         } finally {
             executor.shutdownNow();
         }

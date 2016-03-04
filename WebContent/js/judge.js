@@ -51,10 +51,14 @@ function showErrorMessage(errorCode, message) {
 	div.innerHTML = message;
 }
 
-function showJudgeResult(result) {
+function showJudgeResult(numPassed, numTestCases, base, score, runTime) {
 	removeProgressCircle();
 	showStatus('Finished', '#11BA5D');
+	var percentPassed = (numPassed/numTestCases * 100.0).toFixed(0);
 	var div = document.getElementById('judge_result');
 	$(div).fadeIn(300);
-	div.innerHTML = result;
+	div.innerHTML = 
+		"<font style='font-weight: bold; font-family:Lucida Console;'>"+numPassed+"/"+numTestCases+" </font>test cases passed. ("+percentPassed+"%) <br>" + 
+		"Score: <font style='color:#C38747; font-family:Comic Sans MS;'>"+score+"</font> " + 
+		"<span style='color:#ABABAB; float:right'>(Runtime: "+runTime+" ms)</span>";
 }

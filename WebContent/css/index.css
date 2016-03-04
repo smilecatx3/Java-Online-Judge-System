@@ -1,3 +1,55 @@
+html {
+	height: 100%; 
+	text-align: center;
+	overflow-y: hidden;
+}
+
+body {
+	height: 100%;
+	text-align: center;
+}
+
+hr { 
+	height: 12px; 
+	border: 0; 
+	box-shadow: inset 0 12px 12px -12px #2CCC17;
+	margin-top: 10px;
+}
+
+.title {
+	font-family:Lucida Sans Unicode; 
+	font-size:36px; 
+	font-weight:bold; 
+	text-shadow:3px 3px 3px #CCCCCC;
+}
+
+select {
+	font-family: Lucida Sans Unicode;
+	font-size: 16px;
+	height: 28px;
+}
+.select_hwID {
+	box-shadow: 0.5px 0.5px 1px 1px #96A6FF;
+}
+
+.studentID {
+	font-family: Lucida Sans Unicode;
+	font-size: 16px;
+	height: 20px;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.file {
+	border-color:#31BAFA; 
+	border-width:1px; 
+	border-style:ridge;
+}
+
+.iFrame {
+	border: 0px ridge #F4E34F;
+}
+
 /* http://css3buttongenerator.com/ */
 .btn_submit {
 	background: #6abdf5;
