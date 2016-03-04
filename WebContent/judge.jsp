@@ -40,6 +40,7 @@
 
 <%
 	// Get POST parameters
+	request.setCharacterEncoding("UTF-8");
 	Map<String, FileItem> parameters = new HashMap<>();
 	try {
 		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
@@ -50,9 +51,9 @@
 		return;
 	}
 	String hwID = parameters.get("hwID").getString();
-	String studentID = parameters.get("studentID").getString();
+	String studentID = new String(parameters.get("studentID").getString().getBytes("ISO-8859-1"), "UTF-8");
 	ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
-	
+
 	out.print("<script> drawProgressCircle(); </script>");
 	out.print("<script> showProgress(0, \"Pending ...\"); </script>");
 	out.flush();
