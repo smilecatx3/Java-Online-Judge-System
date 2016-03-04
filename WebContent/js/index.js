@@ -9,15 +9,20 @@ function setIFrameHeight() {
 function validateForm() {
 	var form = document.forms["form"];
 	var button = document.getElementById("btn_submit");
-	var studentID = form["studentID"].value;
 	var file = form["file"].value;
-	if ((studentID != null) && (file != null) && (studentID.length==9) && (file.length > 0)) {
-		button.removeAttribute("disabled");
-		button.className = "btn_submit";
-	} else {
-		button.setAttribute("disabled", true);
-		button.className = "btn_disabled";
+	
+	if (file.length >= 13) {
+		var studentID = file.substring(file.length-13, file.length-4);
+		if (new RegExp(/[A-Z][0-9]{8}/).test(studentID)) {
+			form["studentID"].value = studentID;
+			button.removeAttribute("disabled");
+			button.className = "btn_submit";
+			return;
+		}
 	}
+	form["studentID"].value = "";
+	button.setAttribute("disabled", true);
+	button.className = "btn_disabled";
 }
 
 function submitForm() {

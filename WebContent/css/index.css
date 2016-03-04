@@ -27,8 +27,6 @@ select {
 	font-family: Lucida Sans Unicode;
 	font-size: 16px;
 	height: 28px;
-}
-.select_hwID {
 	box-shadow: 0.5px 0.5px 1px 1px #96A6FF;
 }
 

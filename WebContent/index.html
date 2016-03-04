@@ -15,19 +15,19 @@
 <p>
 
 <form id="form" name="form" enctype="multipart/form-data" method="POST" onsubmit="submitForm()" target="judge">
-	<select id="hwID" name="hwID" class="select_hwID">
+	<select id="hwID" name="hwID" title="Homework ID">
 		<option value="hw1" selected>hw1</option>
 		<option value="demo1">demo1</option>
 		<option value="demo2">demo2</option>
 		<option value="demo3">demo3</option>
 	</select>　　
-	<input type="text" id="studentID" name="studentID" placeholder="Student ID" class="studentID" maxlength="9" size="9" onchange="validateForm()" />　　
-	<select id="mode" name="mode">
+	<select id="mode" name="mode" title="Execution Mode">
 		<option value="standard">standard</option>
 		<option value="stdin">stdin</option>
 	</select>　　
-	<input type="file" name="file" size="30" accept=".zip" onchange="validateForm()" class="file" />　　
-	<input id="btn_submit" type="submit" value="SUBMIT" class="btn_disabled" disabled="true" />
+	<input type="file" name="file" title="Input File" accept=".zip" onchange="validateForm()" class="file" />　　
+	<input type="text" id="studentID" name="studentID" title="Student ID" placeholder="Student ID" class="studentID" maxlength="9" size="9" readonly />　　
+	<input id="btn_submit" type="submit" value="SUBMIT" class="btn_disabled" disabled />
 </form>
 <hr>
 
