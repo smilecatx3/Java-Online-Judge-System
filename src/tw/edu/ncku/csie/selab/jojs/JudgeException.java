@@ -6,7 +6,8 @@ public class JudgeException extends Exception {
         INVALID_INPUT,
         NO_MAIN_CLASS,
         TIME_LIMIT_EXCEEDED,
-        COMPILE_ERROR
+        COMPILE_ERROR,
+        UNSUPPORTED_ENCODING
     }
 
     private ErrorCode code;

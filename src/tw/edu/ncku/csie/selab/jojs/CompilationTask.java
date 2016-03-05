@@ -36,8 +36,12 @@ public class CompilationTask {
     public void execute() throws IOException, JudgeException {
         String[] command = {JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-cp", ANT, "org.apache.tools.ant.launch.Launcher", "-buildfile", generateBuildFile()};
         String output = Executor.execute(command, null);
-        if (output.contains("BUILD FAILED"))
-            throw new JudgeException(getErrorMessage(output), JudgeException.ErrorCode.COMPILE_ERROR);
+        if (output.contains("BUILD FAILED")) {
+            if (output.contains("unmappable character for encoding UTF-8"))
+                throw new JudgeException("Please use UTF-8 encoding four your source files", JudgeException.ErrorCode.UNSUPPORTED_ENCODING);
+            else
+                throw new JudgeException(getErrorMessage(output), JudgeException.ErrorCode.COMPILE_ERROR);
+        }
     }
 
     private String generateBuildFile() throws IOException {
@@ -53,7 +57,6 @@ public class CompilationTask {
         return buildFile.getAbsolutePath();
     }
 
-    // TODO trim leading spaces
     private String getErrorMessage(String output) {
         String srcPath = srcFolder.getAbsolutePath() + File.separator;
         String binPath = binFolder.getAbsolutePath();
@@ -65,7 +68,7 @@ public class CompilationTask {
                     continue;
                 if (line.contains(srcPath))
                     line = line.replace(srcPath, "").replace("\\", "/");
-                result.append(line.replace("[javac]", "")).append("\n");
+                result.append(line.trim().replace("[javac] ", "")).append("\n");
             }
             return result.toString();
         } else {
