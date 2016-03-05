@@ -38,7 +38,7 @@ public class CompilationTask {
         String output = Executor.execute(command, null);
         if (output.contains("BUILD FAILED")) {
             if (output.contains("unmappable character for encoding UTF-8"))
-                throw new JudgeException("Please use UTF-8 encoding four your source files", JudgeException.ErrorCode.UNSUPPORTED_ENCODING);
+                throw new JudgeException("Please use UTF-8 encoding for your source files", JudgeException.ErrorCode.UNSUPPORTED_ENCODING);
             else
                 throw new JudgeException(getErrorMessage(output), JudgeException.ErrorCode.COMPILE_ERROR);
         }
