@@ -9,6 +9,7 @@
 <%@ page import = "org.apache.commons.fileupload.disk.*" %>
 <%@ page import = "org.apache.commons.lang3.*" %>
 <%@ page import = "org.apache.commons.lang3.text.*" %>
+<%@ page import = "org.apache.commons.lang3.exception.*" %>
 <%@ page import = "org.json.*" %>
 <%@ page import = "tw.edu.ncku.csie.selab.jojs.*" %>
 <%@ page import = "tw.edu.ncku.csie.selab.jojs.judger.*" %>
@@ -105,16 +106,18 @@
         }
         out.print("</table>");
     } catch (Exception e) {
-        if (e.getCause() instanceof JudgeException) {
-            JudgeException ex = (JudgeException) e.getCause();
-            String errorCode = WordUtils.capitalizeFully(ex.getErrorCode().toString(), "_".toCharArray()).replace("_", " ");
-            String message = StringEscapeUtils.escapeHtml4(ex.getMessage()).replace("\r", "").replace("\n", "<br/>");
-            out.print(String.format("<script> showErrorMessage('%s', '%s'); </script>", errorCode, message));
+		String title, message;
+		if (e.getCause() instanceof Exception)
+            e = (Exception) e.getCause();
+        if (e instanceof JudgeException) {
+            JudgeException ex = (JudgeException) e;
+            title = WordUtils.capitalizeFully(ex.getErrorCode().toString(), "_".toCharArray()).replace("_", " ");
+            message = StringEscapeUtils.escapeHtml4(ex.getMessage()).replace("\r", "").replace("\n", "<br/>");
         } else {
-            out.println("<pre style='color:red; font-family:Consolas; text-align:left; padding-left:300px; padding-right:300px;'>");
-            e.printStackTrace(new PrintWriter(out, true));
-            out.println("</pre>");
+			title = "Unexpected Error";
+			message = StringEscapeUtils.escapeHtml4(ExceptionUtils.getStackTrace(e)).replace("\r", "").replace("\n", "<br/>");
         }
+		out.print(String.format("<script> showErrorMessage('%s', '%s'); </script>", title, message));
     }
 %>
 

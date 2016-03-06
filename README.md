@@ -102,8 +102,8 @@ You can refer to [demo](https://drive.google.com/folderview?id=0B6go6tO3TUxuVi16
 ### Offline Judgement
 
 Execute the following command with all the required libraries put in the same folder.  
-```java -jar jojs.jar HW_ID MODE(standard|stdin)```  
-For example: ```java -jar jojs.jar hw1 standard```  
+```java -jar jojs.jar {HW_ID} {MODE(standard|stdin)} {BASE_SCORE}```  
+For example: ```java -jar jojs.jar hw1 standard 20```  
 
 A window will be prompted and ask you to select a directory which contains zip files (i.e. source files).  
 A summary file will be produced after execution. The file is in the directory you selected and it contains a list of student id, score, and the testcase number that the answer is incorrect.  
