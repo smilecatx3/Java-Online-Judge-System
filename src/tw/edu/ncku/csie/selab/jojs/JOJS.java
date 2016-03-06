@@ -1,20 +1,29 @@
 package tw.edu.ncku.csie.selab.jojs;
 
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.swing.JFileChooser;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileSystemView;
+
+import tw.edu.ncku.csie.selab.jojs.judger.Judger;
+import tw.edu.ncku.csie.selab.jojs.judger.OfflineJudger;
+
 public class JOJS {
     public static final JSONObject CONFIG;
     public static final String JAVA;
-    public static ExecutorService service;
+    public static ExecutorService executor;
 
     static {
         JSONObject temp = null;
@@ -26,42 +35,27 @@ public class JOJS {
         }
         CONFIG = temp;
         JAVA = CONFIG.getString("java");
-        service = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {service.shutdownNow();}));
+        executor = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
     }
 
-    public synchronized static Future<JudgeResult> judge(Judgement judgement) throws JudgeException, ExecutionException, InterruptedException {
-        return service.submit(() -> {
-            Judger judger = new Judger(judgement.hwID, judgement.studentID);
+    public synchronized static Future<JudgeResult> judge(Judger judger, ExecutionTask.Mode mode) throws JudgeException, ExecutionException, InterruptedException {
+        return executor.submit(() -> {
             try {
-                File zipFile = null;
-                // TODO Need refactoring
-                if (judgement instanceof OnlineJudgement) {
-                    FileItem fileItem = ((OnlineJudgement) judgement).fileItem;
-                    zipFile = new File(judger.getWorkingDirectory(), new File(fileItem.getName()).getName());
-                    fileItem.write(zipFile);
-                } else {
-                    zipFile = ((OfflineJudgement) judgement).file;
-                }
-
-                judgement.reportProgress(0.5, "Compiling");
-                judger.compile(zipFile);
-                return judger.execute(judgement); // TODO need refactoring
+                judger.compile();
+                return judger.execute(mode);
             } finally {
-                judger.cleanWorkingDirectory();
+                judger.clean();
             }
         });
     }
 
 
 
-    /* TODO
     public static void main(String args[]) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         if (args.length != 2) {
-            JOptionPane.showMessageDialog(null, "<html>Usage: <font style=\"font-family:Consolas;\">java -jar JOJS.jar <b>HW_ID</b> <b>MODE(standard|stdin)</b></font></html>");
+            System.err.println("Usage: java -jar jojs.jar {HW_ID} {MODE(standard|stdin)}");
             System.exit(0);
         }
         String hwID = args[0];
@@ -74,40 +68,36 @@ public class JOJS {
         if (fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
             return;
         File folder = fileChooser.getSelectedFile();
-        File[] files = folder.listFiles();
-        assert (files != null);
+        List<File> files = new ArrayList<>(FileUtils.listFiles(folder, new String[] {"zip"}, true));
 
+        // TODO No score when exception occors
         File summary = new File(folder, String.format("summary_%s.csv", hwID));
         StringBuilder summaryBuilder = new StringBuilder("id,score,comment\n");
-        for (int i=0; i<files.length; i++) {
-            File file = files[i];
-            System.out.println(String.format("========== [%s] (%d/%d) ==========", file.getName(), i+1, files.length));
-            if (file.getName().endsWith(".zip")) {
+        for (int i=0; i<files.size(); i++) {
+            File file = files.get(i);
+            System.out.println(String.format("========== [%s] (%d/%d) ==========", file.getName(), i+1, files.size()));
+            try {
                 String studentID = file.getName().replace(".zip", "");
-                Judger judger = new Judger(hwID, studentID);
-                try {
-                    judger.compile(file);
-                    JudgeResult judgeResult = judger.execute(null);
-                    summaryBuilder.append(studentID).append(",").append(judgeResult.getScore()).append(",");
-                    ExecutionResult[] executionResults = judgeResult.getResults();
-                    for (int j=0; j<executionResults.length; j++)
-                        if (!executionResults[j].isPassed())
-                            summaryBuilder.append(j+1).append(" / ");
-                    summaryBuilder.append("\n");
-                    System.out.println(String.format("%s => %d", studentID, judgeResult.getScore()));
-                } catch (JudgeException e) {
+                Future<JudgeResult> future = JOJS.judge(new OfflineJudger(hwID, studentID, (progress, message)->{}, file), mode);
+                JudgeResult judgeResult = future.get();
+                int score = judgeResult.getScore(20);
+                summaryBuilder.append(studentID).append(",").append(score).append(",");
+                ExecutionResult[] executionResults = judgeResult.getResults();
+                for (int j=0; j<executionResults.length; j++)
+                    if (!executionResults[j].isPassed())
+                        summaryBuilder.append(j+1).append("; ");
+                summaryBuilder.append("\n");
+                System.out.println(String.format("%s => %d", studentID, score));
+            } catch (Exception e) {
+                if (e.getCause() instanceof JudgeException)
                     System.out.println(e.getMessage());
-                } catch (Exception e) {
+                else
                     e.printStackTrace(System.out);
-                } finally {
-                    judger.cleanWorkingDirectory();
-                }
-            } else {
-                System.out.println("File name format is incorrect. Skip");
             }
             System.out.println();
         }
         FileUtils.writeStringToFile(summary, summaryBuilder.toString());
+        executor.shutdownNow();
+        System.exit(0);
     }
-    */
 }

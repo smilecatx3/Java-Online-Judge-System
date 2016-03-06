@@ -11,6 +11,7 @@
 <%@ page import = "org.apache.commons.lang3.text.*" %>
 <%@ page import = "org.json.*" %>
 <%@ page import = "tw.edu.ncku.csie.selab.jojs.*" %>
+<%@ page import = "tw.edu.ncku.csie.selab.jojs.judger.*" %>
 
 <html>
 <head>
@@ -59,7 +60,23 @@
     out.flush();
     
     try {
-        JudgeResult judgeResult = JOJS.judge(new OnlineJudgement(hwID, studentID, mode, parameters.get("file"), out)).get();
+        JudgeResult judgeResult = JOJS.judge(
+				new OnlineJudger(
+					hwID, studentID, 
+					new ProgressReporter() {
+						@Override
+						public void reportProgress(double progress, String message) {
+							try {
+								PrintWriter writer = response.getWriter();
+								writer.print(String.format("<script> showProgress(%f, \"%s\"); </script>", progress, message));
+								writer.flush();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					},
+					parameters.get("file")
+				), mode).get();
         ExecutionResult[] results = judgeResult.getResults();
         JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
         JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");

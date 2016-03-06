@@ -101,8 +101,6 @@ You can refer to [demo](https://drive.google.com/folderview?id=0B6go6tO3TUxuVi16
   
 ### Offline Judgement
 
-(Note: This feature is disabled for v2.0.0)
-
 Execute the following command with all the required libraries put in the same folder.  
 ```java -jar jojs.jar HW_ID MODE(standard|stdin)```  
 For example: ```java -jar jojs.jar hw1 standard```  
