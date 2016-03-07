@@ -16,3 +16,7 @@ temp/
 # Intellij Idea project files
 .idea/
 *.iml
+
+# Eclipse project files
+.classpath
+.project

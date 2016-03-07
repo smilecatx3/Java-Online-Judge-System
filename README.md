@@ -96,6 +96,8 @@ MANIFEST.MF specifies the enrty point (i.e. main class) of the program.
 
 The zip file name should be in the format `[A-Z][0-9]{8}`, i.e. NCKU student ID format.  
 You can refer to [demo](https://drive.google.com/folderview?id=0B6go6tO3TUxuVi16bHdnUEJRSkU&usp=sharing) for an example.
+
+You can use InputCreator in jojs.jar to create the input file for convenience.  
   
 <br/>
   
