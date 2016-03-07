@@ -2,10 +2,13 @@ package tw.edu.ncku.csie.selab.jojs;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -51,10 +54,10 @@ public class JOJS {
 
 
 
-    // TODO add log file
     public static void main(String args[]) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
+        // Get judgement information
         if (args.length != 3) {
             System.err.println("Usage: java -jar jojs.jar {HW_ID} {MODE(standard|stdin)} {BASE_SCORE}");
             System.exit(0);
@@ -72,13 +75,19 @@ public class JOJS {
         File folder = fileChooser.getSelectedFile();
         List<File> files = new ArrayList<>(FileUtils.listFiles(folder, new String[] {"zip"}, true));
 
+        // Prepare outputs
+        PrintStream out = new PrintStream(new TeeOutputStream(
+                System.out, 
+                new FileOutputStream(new File(folder, String.format("log_%s.txt", hwID)))));
         File summary = new File(folder, String.format("summary_%s.csv", hwID));
+
+        // Start judgement
         StringBuilder summaryBuilder = new StringBuilder("id,score,comment\n");
         for (int i=0; i<files.size(); i++) {
             File file = files.get(i);
             String studentID = file.getName().replace(".zip", "");
             StringBuilder comment = new StringBuilder();
-            System.out.println(String.format("========== [%s] (%d/%d) ==========", studentID, i+1, files.size()));
+            out.println(String.format("========== [%s] (%d/%d) ==========", studentID, i+1, files.size()));
             try {
                 Future<JudgeResult> future = JOJS.judge(new OfflineJudger(hwID, studentID, (progress, message)->{}, file), mode);
                 JudgeResult judgeResult = future.get();
@@ -94,17 +103,18 @@ public class JOJS {
                     JudgeException ex = (JudgeException) e;
                     JudgeException.ErrorCode errorCode = ex.getErrorCode();
                     if (errorCode==JudgeException.ErrorCode.INVALID_STUDENT_ID) {
-                        System.out.println(errorCode+"\n");
+                        out.println(errorCode+"\n");
                         continue;
                     }
                     comment.append(errorCode);
                 } else {
-                    e.printStackTrace(System.out);
+                    e.printStackTrace(out);
                 }
             }
             summaryBuilder.append(studentID).append(",").append(score).append(",").append(comment).append("\n");
-            System.out.println(String.format("%s => %d %s %n", studentID, score, (comment.length()>0) ? "/ "+comment : ""));
+            out.println(String.format("%s => %d %s %n", studentID, score, (comment.length()>0) ? "/ "+comment : ""));
         }
+
         FileUtils.writeStringToFile(summary, summaryBuilder.toString());
         executor.shutdownNow();
         System.exit(0);
