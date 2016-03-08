@@ -84,7 +84,7 @@
         
 		out.print("<div id='summary' style='display: none'> <table id='summary_table'>");
         out.print("<tr class='tr1'>" +
-                "<td onclick='showDetail(0)'> # </td>" +
+                "<td onclick='showDetail(-1)'> # </td>" +
                 "<td> Result </td>" +
 				"<td> Input </td>" +
                 "<td> Your Answer </td>" +
@@ -93,15 +93,15 @@
         for (int i=0; i<results.length; i++) {
 			String ioTag = "<td class='io'>" +
                 "<div id='io_show_%d' style='display:none;'>%s</div>" +
-                "<div id='io_collapse' style='text-align:center;'>...</div>" +
+                "<div id='io_collapse_%d' style='text-align:center;'>...</div>" +
                 "</td>";
             ExecutionResult result = results[i];
             out.print("<tr>");
-            out.print(String.format("<td class='id' >%s</td>", i+1));
+            out.print(String.format("<td class='id' onclick='showDetail(%d)'>%s</td>", i, i+1));
             out.print(String.format("<td class='%s'>%s</td>", result.isPassed()?"accepted":"incorrect", result.isPassed()?"Accepted":"Incorrect"));
-            out.print(String.format(ioTag, i, (inputs.length() > 0) ? printJsonArray(inputs.getJSONArray(i)) : ""));
-            out.print(String.format(ioTag, i, result.getAnswer()));
-            out.print(String.format(ioTag, i, printJsonArray(outputs.getJSONArray(i))));
+            out.print(String.format(ioTag, i, (inputs.length() > 0) ? printJsonArray(inputs.getJSONArray(i)) : "", i));
+            out.print(String.format(ioTag, i, result.getAnswer(), i));
+            out.print(String.format(ioTag, i, printJsonArray(outputs.getJSONArray(i)), i));
             out.print("</tr>");
         }
 		out.print("</table> </div>");

@@ -70,8 +70,35 @@ function showJudgeResult(numPassed, numTestCases, base, score, runTime) {
 }
 
 function showDetail(id) {
-	if (id == 0) {
-		$('[id^="io_show_"]').slideToggle(500);
-		$('[id^="io_collapse"]').slideToggle(500);
+	var duration = 300;
+	
+	if (id == -1) {
+		var isAllExpanded = true;
+		$('[id^="io_show_"]').each(function() {
+			if ($(this).css('display')=='none') {
+				isAllExpanded = false;
+				return false;
+			}
+		});
+		if (isAllExpanded) {
+			$('[id^="io_show_"]').each(function() {
+				$(this).slideUp(duration);
+			});
+			$('[id^="io_collapse"]').each(function() {
+				$(this).slideDown(duration);
+			});
+		} else {
+			$('[id^="io_show_"]').each(function() {
+				$(this).slideDown(duration);
+			});
+			$('[id^="io_collapse"]').each(function() {
+				$(this).slideUp(duration);
+			});
+		}
+	} else {
+		var io_show = "io_show_"+id;
+		var io_collapse = "io_collapse_"+id;
+		$('[id='+io_show+']').slideToggle(duration);
+		$('[id='+io_collapse+']').slideToggle(duration);
 	}
 }
