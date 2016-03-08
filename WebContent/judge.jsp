@@ -107,8 +107,8 @@
 		out.print("</table> </div>");
 		
         int base = 20;
-        out.print(String.format("<script> showJudgeResult(%d, %d, %d, %d, %d); </script>", 
-                    judgeResult.getNumPassed(), results.length, base, judgeResult.getScore(base), judgeResult.getRuntime()));
+        out.print(String.format("<script> showJudgeResult('%s', %d, %d, %d, %d); </script>", 
+                    hwID, judgeResult.getNumPassed(), results.length, judgeResult.getScore(base), judgeResult.getRuntime()));
     } catch (Exception e) {
 		String title, message;
 		if (e.getCause() instanceof Exception)
@@ -116,12 +116,13 @@
         if (e instanceof JudgeException) {
             JudgeException ex = (JudgeException) e;
             title = WordUtils.capitalizeFully(ex.getErrorCode().toString(), "_".toCharArray()).replace("_", " ");
-            message = StringEscapeUtils.escapeHtml4(ex.getMessage()).replace("\r", "").replace("\n", "<br/>");
+            message = ex.getMessage();
         } else {
 			title = "Unexpected Error";
-			message = StringEscapeUtils.escapeHtml4(ExceptionUtils.getStackTrace(e)).replace("\r", "").replace("\n", "<br/>");
+			message = ExceptionUtils.getStackTrace(e);
         }
-		out.print(String.format("<script> showErrorMessage('%s', '%s'); </script>", title, message));
+		message = StringEscapeUtils.escapeHtml4(message).replace("\r", "").replace("\n", "<br/>").replace("\\", "/");
+		out.print(String.format("<script> showErrorMessage(\"%s\", \"%s\"); </script>", title, message));
     }
 %>
 

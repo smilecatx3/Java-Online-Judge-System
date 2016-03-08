@@ -8,6 +8,11 @@ body {
 	font-size:16;
 }
 
+a {
+	color: #587CE6;
+	text-decoration: none;
+}
+
 .status {
 	font-family: Lucida Sans Unicode; 
 	font-size: 20px; 
