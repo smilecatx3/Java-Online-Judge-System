@@ -71,19 +71,9 @@ public class ExecutionTask implements Callable<JudgeResult> {
             elapsedTime += System.currentTimeMillis() - startTime;
 
             // Examine the output
-            JSONArray output = outputs.getJSONArray(i);
-            boolean passed = true;
-            String[] linesOfAnswer = answer.trim().split("\n");
-            if (linesOfAnswer.length != output.length()) {
-                passed = false;
-            } else {
-                for (int j=0; j<output.length(); j++) {
-                    if (!linesOfAnswer[j].trim().equals(output.getString(j).trim())) {
-                        passed = false;
-                        break;
-                    }
-                }
-            }
+            String output = outputs.getString(i).replace("\r", "").trim();
+            answer = answer.replace("\r", "").trim();
+            boolean passed = answer.equals(output);
             results[i] = new ExecutionResult(passed, answer);
         }
         return new JudgeResult(testcase, results, elapsedTime/results.length);

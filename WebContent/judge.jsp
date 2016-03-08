@@ -24,8 +24,8 @@
     String printJsonArray(JSONArray array) {
         StringBuilder result = new StringBuilder();
         for (int i=0; i<array.length(); i++)
-            result.append(array.getString(i)).append("\n");
-        return StringEscapeUtils.escapeHtml4(result.toString());
+            result.append(StringEscapeUtils.escapeHtml4(array.getString(i))).append("\n").append("<hr>");
+        return result.substring(0, result.lastIndexOf("<hr>")).toString();
     }
 %>
 
@@ -100,8 +100,8 @@
             out.print(String.format("<td class='id' onclick='showDetail(%d)'>%s</td>", i, i+1));
             out.print(String.format("<td class='%s'>%s</td>", result.isPassed()?"accepted":"incorrect", result.isPassed()?"Accepted":"Incorrect"));
             out.print(String.format(ioTag, i, (inputs.length() > 0) ? printJsonArray(inputs.getJSONArray(i)) : "", i));
-            out.print(String.format(ioTag, i, result.getAnswer(), i));
-            out.print(String.format(ioTag, i, printJsonArray(outputs.getJSONArray(i)), i));
+            out.print(String.format(ioTag, i, StringEscapeUtils.escapeHtml4(result.getAnswer()), i));
+            out.print(String.format(ioTag, i, outputs.getString(i), i));
             out.print("</tr>");
         }
 		out.print("</table> </div>");
