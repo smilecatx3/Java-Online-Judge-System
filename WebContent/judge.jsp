@@ -57,7 +57,7 @@
     ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
 
     out.print("<script> drawProgressCircle(); </script>");
-    out.print("<script> showProgress(0, \"Pending ...\"); </script>");
+    out.print("<script> showProgress(0, \"Pending\"); </script>");
     out.flush();
     
     try {
@@ -82,29 +82,33 @@
         JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
         JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
         
-        int base = 20;
-        out.print(String.format("<script> showJudgeResult(%d, %d, %d, %d, %d); </script>", 
-                    judgeResult.getNumPassed(), results.length, base, judgeResult.getScore(base), judgeResult.getRuntime()));
-        
-        out.print("<table>");
+		out.print("<div id='summary' style='display: none'> <table id='summary_table'>");
         out.print("<tr class='tr1'>" +
-                "<td> # </td>" +
+                "<td onclick='showDetail(0)'> # </td>" +
                 "<td> Result </td>" +
 				"<td> Input </td>" +
                 "<td> Your Answer </td>" +
                 "<td> Expected Answer </td>" +
                 "</tr>");
         for (int i=0; i<results.length; i++) {
+			String ioTag = "<td class='io'>" +
+                "<div id='io_show_%d' style='display:none;'>%s</div>" +
+                "<div id='io_collapse' style='text-align:center;'>...</div>" +
+                "</td>";
             ExecutionResult result = results[i];
             out.print("<tr>");
-            out.print(String.format("<td class='id'>%s</td>", i+1));
+            out.print(String.format("<td class='id' >%s</td>", i+1));
             out.print(String.format("<td class='%s'>%s</td>", result.isPassed()?"accepted":"incorrect", result.isPassed()?"Accepted":"Incorrect"));
-            out.print(String.format("<td class='io'>%s</td>", (inputs.length() > 0) ? printJsonArray(inputs.getJSONArray(i)) : ""));
-            out.print(String.format("<td class='io'>%s</td>", result.getAnswer()));
-            out.print(String.format("<td class='io'>%s</td>", printJsonArray(outputs.getJSONArray(i))));
+            out.print(String.format(ioTag, i, (inputs.length() > 0) ? printJsonArray(inputs.getJSONArray(i)) : ""));
+            out.print(String.format(ioTag, i, result.getAnswer()));
+            out.print(String.format(ioTag, i, printJsonArray(outputs.getJSONArray(i))));
             out.print("</tr>");
         }
-        out.print("</table>");
+		out.print("</table> </div>");
+		
+        int base = 20;
+        out.print(String.format("<script> showJudgeResult(%d, %d, %d, %d, %d); </script>", 
+                    judgeResult.getNumPassed(), results.length, base, judgeResult.getScore(base), judgeResult.getRuntime()));
     } catch (Exception e) {
 		String title, message;
 		if (e.getCause() instanceof Exception)

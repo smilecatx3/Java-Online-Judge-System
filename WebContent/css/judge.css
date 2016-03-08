@@ -28,7 +28,7 @@ body {
     border-radius: 10px;
     background: #FFCED7;
 	color: #D50E33;
-	font-family: "Consolas", Courier, monospace;
+	font-family: 'Consolas', Courier, monospace;
 	font-size: 16px;
     padding: 15px 20px 15px 20px;
 	min-width: 600px;
@@ -95,8 +95,8 @@ table tr, table td {
 }
 
 .io {
-	font-family: "Consolas", Courier, monospace;
-	//word-wrap: break-word;
+	font-family: 'Consolas', Courier, monospace;
+	word-wrap: break-word;
 	white-space: pre-wrap;
 	word-break: break-all;
 	vertical-align: top;

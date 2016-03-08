@@ -54,11 +54,24 @@ function showErrorMessage(errorCode, message) {
 function showJudgeResult(numPassed, numTestCases, base, score, runTime) {
 	removeProgressCircle();
 	showStatus('Finished', '#11BA5D');
+	
+	// Show judge result
 	var percentPassed = (numPassed/numTestCases * 100.0).toFixed(0);
-	var div = document.getElementById('judge_result');
-	$(div).fadeIn(300);
-	div.innerHTML = 
+	var div_judge_result = document.getElementById('judge_result');
+	div_judge_result.innerHTML = 
 		"<font style='font-weight: bold; font-family:Lucida Console;'>"+numPassed+"/"+numTestCases+" </font>test cases passed. ("+percentPassed+"%) <br>" + 
 		"Score: <font style='color:#C38747; font-family:Comic Sans MS;'>"+score+"</font> " + 
 		"<span style='color:#ABABAB; float:right'>(Runtime: "+runTime+" ms)</span>";
+	$(div_judge_result).fadeIn(300);
+	
+	// Show summary
+	var div_summary = document.getElementById("summary");
+	$(div_summary).slideDown(500);
+}
+
+function showDetail(id) {
+	if (id == 0) {
+		$('[id^="io_show_"]').slideToggle(500);
+		$('[id^="io_collapse"]').slideToggle(500);
+	}
 }
