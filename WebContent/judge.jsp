@@ -82,7 +82,7 @@
         JSONArray inputs = judgeResult.getTestcase().getJSONArray("inputs");
         JSONArray outputs = judgeResult.getTestcase().getJSONArray("outputs");
         
-		out.print("<div id='summary' style='display: none'> <table id='summary_table'>");
+		out.print("<div id='summary' style='display: none'> <table>");
         out.print("<tr class='tr1'>" +
                 "<td onclick='showDetail(-1)'> # </td>" +
                 "<td> Result </td>" +
@@ -93,7 +93,7 @@
         for (int i=0; i<results.length; i++) {
 			String ioTag = "<td class='io'>" +
                 "<div id='io_show_%d' style='display:none;'>%s</div>" +
-                "<div id='io_collapse_%d' style='text-align:center;'>...</div>" +
+                "<div id='io_collapse_%d' style='color:#C0C0C0; text-align:center;'>...</div>" +
                 "</td>";
             ExecutionResult result = results[i];
             out.print("<tr>");

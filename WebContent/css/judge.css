@@ -62,14 +62,26 @@ a {
 
 /* Summary Table */
 table {
-	border: 1px solid #0755F2;
+	border: 2px groove #68BAF9;
 	margin: auto;
+	border-collapse: collapse;
 }
 
-table tr, table td {
-	border: 1px solid #8BABEB;
+table tr {
+	border: 1px solid #AAD4F3;
 	max-width:500px; 
 	padding: 5px 10px 5px 10px;
+}
+
+table td {
+	//border: 1px solid #D5D5D5;
+	max-width:500px; 
+	padding: 5px 10px 5px 10px;
+	border-right: 1px solid #E7E7E7
+}
+
+table tr:hover {
+	background: #FCFCFF;
 }
 
 .tr1 td {
@@ -77,12 +89,16 @@ table tr, table td {
 	font-family: Lucida Sans Unicode;
 	text-align: center;
 	padding: 0px 10px 0px 10px;
+	background: #E1F2FF;
+	color: #2DA2FB;
 }
 
 .id {
 	font-family: Comic Sans MS;
 	text-align: center;
 	vertical-align: text-top;
+	color: #587CE6;
+	padding: 5px 13px 5px 13px;
 }
 
 .accepted {
