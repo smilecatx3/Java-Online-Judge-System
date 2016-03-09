@@ -24,6 +24,7 @@ a {
 	font-size: 40px;
 	padding: 20px 0px 20px 0px;
 }
+
 #progress > svg {
 	height: 100%;
 	display: block;
@@ -73,15 +74,22 @@ table tr {
 	padding: 5px 10px 5px 10px;
 }
 
+table tr:hover {
+	background: #FCFCFF;
+}
+
 table td {
-	//border: 1px solid #D5D5D5;
 	max-width:500px; 
 	padding: 5px 10px 5px 10px;
 	border-right: 1px solid #E7E7E7
 }
 
-table tr:hover {
-	background: #FCFCFF;
+table hr {
+	border: 0px;
+    height: 1px;
+    background-image: linear-gradient(to right, #E6F6FF, #86CBF3, #E6F6FF);
+	margin-left: -5px;
+	margin-right: -5px;
 }
 
 .tr1 td {
