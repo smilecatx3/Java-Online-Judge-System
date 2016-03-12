@@ -34,7 +34,7 @@ public class OfflineJudgement {
         }
         String hwID = args[0];
         ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(args[1]);
-        int score = Integer.parseInt(args[2]);
+        int base = Integer.parseInt(args[2]);
 
         // Choose source directory
         JFileChooser fileChooser = new JFileChooser();
@@ -58,12 +58,14 @@ public class OfflineJudgement {
             for (int i=0; i<files.size(); i++) {
                 File inputFile = files.get(i);
                 String studentID = inputFile.getName().replace(".zip", "");
+                int score = 0;
                 StringBuilder comment = new StringBuilder();
                 out.println(String.format("========== [%s] (%d/%d) ==========", studentID, i+1, files.size()));
                 try {
                     Future<JudgeResult> future = JOJS.judge(new OfflineJudger(hwID, studentID, (progress, message)->{}, inputFile), mode);
                     JudgeResult judgeResult = future.get();
-                    score = judgeResult.getScore(score);
+                    score = judgeResult.getScore(base);
+                    System.out.println(score);
                     ExecutionResult[] executionResults = judgeResult.getResults();
                     for (int j=0; j<executionResults.length; j++)
                         if (!executionResults[j].isPassed())

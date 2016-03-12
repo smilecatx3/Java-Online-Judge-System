@@ -57,7 +57,8 @@ public class PlagiarismDetector {
                 "\\p{InCJK_SYMBOLS_AND_PUNCTUATION}" +
                 "\\p{InHIRAGANA}" + "\\p{InKATAKANA}" +
                 "\\p{InHANGUL_SYLLABLES}" +
-                "]|//.*";
+                "]|" +
+                "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)";
         for (File input : FileUtils.listFiles(folder, new String[]{"java"}, true)) {
             FileUtils.writeStringToFile(
                     input,
