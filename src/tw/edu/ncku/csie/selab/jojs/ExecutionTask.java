@@ -9,12 +9,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import tw.edu.ncku.csie.selab.jojs.judger.ProgressReporter;
 import tw.edu.ncku.csie.selab.jojs.util.Executor;
 
-public class ExecutionTask implements Callable<JudgeResult> {
+public class ExecutionTask {
     public enum Mode {
         STANDARD, STDIN;
 
@@ -27,11 +31,13 @@ public class ExecutionTask implements Callable<JudgeResult> {
         }
     }
 
+    private static long TIMEOUT = JOJS.CONFIG.getLong("timeout");
     private JSONObject testcase;
     private File binFolder;
     private String entryPoint;
     private Mode mode;
     private ProgressReporter reporter;
+
 
     public ExecutionTask(File testcase, File binFolder, String entryPoint, Mode mode, ProgressReporter reporter) throws IOException {
         this.testcase = new JSONObject(FileUtils.readFileToString(testcase));
@@ -41,8 +47,7 @@ public class ExecutionTask implements Callable<JudgeResult> {
         this.reporter = reporter;
     }
 
-    @Override
-    public JudgeResult call() throws IOException {
+    public JudgeResult execute() throws IOException, ExecutionException, InterruptedException {
         JSONArray inputs = testcase.getJSONArray("inputs");
         JSONArray outputs = testcase.getJSONArray("outputs");
         ExecutionResult[] results = new ExecutionResult[outputs.length()];
@@ -66,15 +71,24 @@ public class ExecutionTask implements Callable<JudgeResult> {
             }
 
             // Execute the program and record elapased time
-            long startTime = System.currentTimeMillis();
-            String answer = Executor.execute(command.toArray(new String[command.size()]), inputFile);
-            elapsedTime += System.currentTimeMillis() - startTime;
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            try {
+                final File file = inputFile; // For lambda
+                long startTime = System.currentTimeMillis();
+                String answer = executor.submit(() -> Executor.execute(command.toArray(new String[command.size()]), file)).get(TIMEOUT, TimeUnit.MILLISECONDS);
+                elapsedTime += System.currentTimeMillis() - startTime;
 
-            // Examine the output
-            String output = outputs.getString(i).replace("\r", "").trim();
-            answer = answer.replace("\r", "").trim();
-            boolean passed = answer.equals(output);
-            results[i] = new ExecutionResult(passed, answer);
+                // Examine the output
+                String output = outputs.getString(i).replace("\r", "").trim();
+                answer = answer.replace("\r", "").trim();
+                boolean passed = answer.equals(output);
+                results[i] = new ExecutionResult(passed, answer);
+            } catch (TimeoutException e) {
+                elapsedTime += TIMEOUT;
+                results[i] = new ExecutionResult(false, "Time limit exceeded");
+            } finally {
+                executor.shutdownNow();
+            }
         }
         return new JudgeResult(testcase, results, elapsedTime/results.length);
     }

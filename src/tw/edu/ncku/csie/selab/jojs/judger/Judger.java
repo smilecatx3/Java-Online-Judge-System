@@ -6,11 +6,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import tw.edu.ncku.csie.selab.jojs.CompilationTask;
 import tw.edu.ncku.csie.selab.jojs.ExecutionTask;
@@ -20,7 +15,6 @@ import tw.edu.ncku.csie.selab.jojs.JudgeResult;
 
 public abstract class Judger {
     private static final File TESTCASE_DIR = new File(JOJS.CONFIG.getString("testcase_dir"));
-    private static final int TIMEOUT = JOJS.CONFIG.getInt("exec_timeout");
     private String hwID, studentID;
     private File srcFolder, binFolder;
     private ProgressReporter reporter;
@@ -71,16 +65,8 @@ public abstract class Judger {
         if (entryPoint == null)
             throw new JudgeException("The Main-Class is not specified.", JudgeException.ErrorCode.NO_MAIN_CLASS);
 
-        // Execute the program with time limit
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        try {
-            Future<JudgeResult> future = executor.submit(new ExecutionTask(new File(TESTCASE_DIR, hwID+".json"), binFolder, entryPoint, mode, reporter));
-            return future.get(TIMEOUT, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            throw new JudgeException(String.format("Your program exceeded time limit %d seconds.", TIMEOUT), JudgeException.ErrorCode.TIME_LIMIT_EXCEEDED);
-        } finally {
-            executor.shutdownNow();
-        }
+        // Execute the program
+        return new ExecutionTask(new File(TESTCASE_DIR, hwID+".json"), binFolder, entryPoint, mode, reporter).execute();
     }
 
     public void clean() {
