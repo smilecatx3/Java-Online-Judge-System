@@ -70,7 +70,6 @@ table {
 
 table tr {
 	border: 1px solid #AAD4F3;
-	max-width:500px; 
 	padding: 5px 10px 5px 10px;
 }
 
@@ -79,7 +78,7 @@ table tr:hover {
 }
 
 table td {
-	max-width:500px; 
+	max-width: 450px; 
 	padding: 5px 10px 5px 10px;
 	border-right: 1px solid #E7E7E7
 }

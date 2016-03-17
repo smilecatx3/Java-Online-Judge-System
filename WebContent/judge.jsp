@@ -34,7 +34,7 @@
 <script src="js/judge.js"></script>
 
 <div class="status"> 
-    <font style="color:black;">Run Code Status: </font> <span id="status"></span>
+    <font style="color:black;">Submission Status: </font> <span id="status"></span>
 </div>
 <div id="progress"></div>
 <div id="judge_error"></div>
@@ -92,8 +92,8 @@
                 "</tr>");
         for (int i=0; i<results.length; i++) {
 			String ioTag = "<td class='io'>" +
-                "<div id='io_show_%d' style='display:none;'>%s</div>" +
-                "<div id='io_collapse_%d' style='color:#C0C0C0; text-align:center;'>...</div>" +
+                "<div id='io_show_%d'>%s</div>" +
+                "<div id='io_collapse_%d' style='color:#C0C0C0; text-align:center; display:none;'>...</div>" +
                 "</td>";
             ExecutionResult result = results[i];
             out.print("<tr>");
