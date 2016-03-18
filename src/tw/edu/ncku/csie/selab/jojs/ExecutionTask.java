@@ -10,13 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import tw.edu.ncku.csie.selab.jojs.judger.ProgressReporter;
-import tw.edu.ncku.csie.selab.jojs.util.Executor;
 
 public class ExecutionTask {
     public enum Mode {
@@ -48,6 +43,7 @@ public class ExecutionTask {
     }
 
     public JudgeResult execute() throws IOException, ExecutionException, InterruptedException {
+        ProcessExecutor executor = new ProcessExecutor(TIMEOUT);
         JSONArray inputs = testcase.getJSONArray("inputs");
         JSONArray outputs = testcase.getJSONArray("outputs");
         ExecutionResult[] results = new ExecutionResult[outputs.length()];
@@ -70,25 +66,17 @@ public class ExecutionTask {
                 }
             }
 
-            // Execute the program and record elapased time
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            try {
-                final File file = inputFile; // For lambda
-                long startTime = System.currentTimeMillis();
-                String answer = executor.submit(() -> Executor.execute(command.toArray(new String[command.size()]), file)).get(TIMEOUT, TimeUnit.MILLISECONDS);
-                elapsedTime += System.currentTimeMillis() - startTime;
-
-                // Examine the output
-                String output = outputs.getString(i).replace("\r", "").trim();
-                answer = answer.replace("\r", "").trim();
+            // Execute the program
+            ProcessExecutor.Result result = executor.execute(command.toArray(new String[command.size()]), inputFile);
+            if (result.isTimeout) {
+                results[i] = new ExecutionResult(false, "Time limit exceeded");
+            } else {
+                String answer = result.output.replace("\r", "").trim(); // Your output
+                String output = outputs.getString(i).replace("\r", "").trim(); // Expected output
                 boolean passed = answer.equals(output);
                 results[i] = new ExecutionResult(passed, answer);
-            } catch (TimeoutException e) {
-                elapsedTime += TIMEOUT;
-                results[i] = new ExecutionResult(false, "Time limit exceeded");
-            } finally {
-                executor.shutdownNow();
             }
+            elapsedTime += result.runtime;
         }
         return new JudgeResult(testcase, results, elapsedTime/results.length);
     }

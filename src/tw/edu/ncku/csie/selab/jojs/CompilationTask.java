@@ -9,8 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 
-import tw.edu.ncku.csie.selab.jojs.util.Executor;
-
 public class CompilationTask {
     private static String ANT;
     private static String BUILD_FILE_TEMPLATE;
@@ -33,9 +31,9 @@ public class CompilationTask {
         this.binFolder = binFolder;
     }
 
-    public void execute() throws IOException, JudgeException {
+    public void execute() throws IOException, JudgeException, InterruptedException {
         String[] command = {JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-cp", ANT, "org.apache.tools.ant.launch.Launcher", "-buildfile", generateBuildFile()};
-        String output = Executor.execute(command, null);
+        String output = new ProcessExecutor(5000).execute(command, null).output;
         if (output.contains("BUILD FAILED")) {
             if (output.contains("unmappable character for encoding UTF-8"))
                 throw new JudgeException("Please use UTF-8 encoding for your source files", JudgeException.ErrorCode.UNSUPPORTED_ENCODING);
