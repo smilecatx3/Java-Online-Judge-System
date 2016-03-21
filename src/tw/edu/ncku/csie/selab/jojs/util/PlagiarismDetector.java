@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import it.zielke.moji.MossException;
@@ -23,6 +24,13 @@ public class PlagiarismDetector {
         socketClient.setLanguage("java");
         socketClient.run();
         this.out = out;
+    }
+
+    public String start(String files) throws MossException, ZipException, IOException {
+        List<File> list = new ArrayList<>();
+        for (String file : files.substring(1, files.length()-1).split(","))
+            list.add(new File(file.trim()));
+        return start(list);
     }
 
     public String start(List<File> files) throws IOException, ZipException, MossException {
@@ -49,7 +57,6 @@ public class PlagiarismDetector {
     }
 
     private void upload(File folder) throws IOException {
-        // TODO Not consider block comment yet
         // Need remove all non ascii words and comments to prevent exceptions thrown by MOJI
         String regex = "[" +
                 "\\p{InCJK_UNIFIED_IDEOGRAPHS}" +
@@ -57,12 +64,13 @@ public class PlagiarismDetector {
                 "\\p{InCJK_SYMBOLS_AND_PUNCTUATION}" +
                 "\\p{InHIRAGANA}" + "\\p{InKATAKANA}" +
                 "\\p{InHANGUL_SYLLABLES}" +
-                "]|" +
-                "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)";
+                "]";
         for (File input : FileUtils.listFiles(folder, new String[]{"java"}, true)) {
-            FileUtils.writeStringToFile(
-                    input,
-                    FileUtils.readFileToString(input).replaceAll(regex, ""));
+            FileUtils.writeStringToFile(input,
+                    FileUtils.readFileToString(input)
+                            .replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1") // Remove comments
+                            .replaceAll(regex, "") // Remove non ascii words
+                            .trim());
             socketClient.uploadFile(input);
         }
     }

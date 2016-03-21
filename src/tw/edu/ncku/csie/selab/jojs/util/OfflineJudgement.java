@@ -65,7 +65,6 @@ public class OfflineJudgement {
                     Future<JudgeResult> future = JOJS.judge(new OfflineJudger(hwID, studentID, (progress, message)->{}, inputFile), mode);
                     JudgeResult judgeResult = future.get();
                     score = judgeResult.getScore(base);
-                    System.out.println(score);
                     ExecutionResult[] executionResults = judgeResult.getResults();
                     for (int j=0; j<executionResults.length; j++)
                         if (!executionResults[j].isPassed())
