@@ -59,9 +59,8 @@ function showJudgeResult(hwID, numPassed, numTestCases, score, runTime) {
 	var percentPassed = (numPassed/numTestCases * 100.0).toFixed(0);
 	var div_judge_result = document.getElementById('judge_result');
 	var json = hwID+".json";
-	var txt = hwID+".txt";
 	div_judge_result.innerHTML = 
-		"Test cases: <a target='_blank' href='testcase/"+txt+"'>txt</a>  <a target='_blank' href='testcase/"+json+"'>json</a> <br>" +
+		"Test cases: <a target='_blank' href='testcase/"+json+"'>"+json+"</a> <br>" +
 		"Passed <font style='font-weight: bold; font-family:Lucida Console;'>"+numPassed+"/"+numTestCases+"</font> test cases ("+percentPassed+"%) <br>" + 
 		"Score: <font style='color:#C38747; font-family:Comic Sans MS;'>"+score+"</font> " + 
 		"<span style='color:#ABABAB; float:right'>(Runtime: "+runTime+" ms)</span>";

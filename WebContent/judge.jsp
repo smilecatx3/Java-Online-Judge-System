@@ -54,7 +54,7 @@
     }
     String hwID = parameters.get("hwID").getString();
     String studentID = new String(parameters.get("studentID").getString().getBytes("ISO-8859-1"), "UTF-8");
-    ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(parameters.get("mode").getString());
+    Judger.Mode mode = parameters.get("mode").getString().equals("standard") ? Judger.Mode.STANDARD : Judger.Mode.STDIN;
 
     out.print("<script> drawProgressCircle(); </script>");
     out.print("<script> showProgress(0, \"Pending\"); </script>");

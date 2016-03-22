@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -29,11 +28,10 @@ public class JOJS {
         executor = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
     }
 
-    public synchronized static Future<JudgeResult> judge(Judger judger, ExecutionTask.Mode mode) throws JudgeException, ExecutionException, InterruptedException {
+    public synchronized static Future<JudgeResult> judge(Judger judger, Judger.Mode mode) {
         return executor.submit(() -> {
             try {
-                judger.compile();
-                return judger.execute(mode);
+                return judger.judge(mode);
             } finally {
                 judger.clean();
             }

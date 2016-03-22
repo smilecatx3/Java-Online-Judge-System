@@ -22,6 +22,10 @@ public class ProcessExecutor {
 
     private long timeout;
 
+    public ProcessExecutor() {
+        this(5000L);
+    }
+
     public ProcessExecutor(long timeout) {
         this.timeout = timeout;
     }

@@ -8,7 +8,6 @@ Firstly, you should configure the program settings in **jojs.jar/data/config.jso
 - **java** is the path to the java program (under the jdk/bin directory, do not use the jre's one)  
 - **ant_home** is the path to the Apache Ant home directory  
 - **testcase_dir** is the path to the directory where the test case files are put here  
-- **timeout** is the execution timeout (in seconds)  
 - **max_thread** is the maximum number of simultaneous judgements  
 
 <br/>

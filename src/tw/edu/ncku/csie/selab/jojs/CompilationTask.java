@@ -33,7 +33,7 @@ public class CompilationTask {
 
     public void execute() throws IOException, JudgeException, InterruptedException {
         String[] command = {JOJS.JAVA, "-Dfile.encoding=UTF-8", "-Duser.language=en", "-cp", ANT, "org.apache.tools.ant.launch.Launcher", "-buildfile", generateBuildFile()};
-        String output = new ProcessExecutor(5000).execute(command, null).output;
+        String output = new ProcessExecutor().execute(command, null).output;
         if (output.contains("BUILD FAILED")) {
             if (output.contains("unmappable character for encoding UTF-8"))
                 throw new JudgeException("Please use UTF-8 encoding for your source files", JudgeException.ErrorCode.UNSUPPORTED_ENCODING);
@@ -73,4 +73,5 @@ public class CompilationTask {
             return output;
         }
     }
+
 }

@@ -16,10 +16,10 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
 import tw.edu.ncku.csie.selab.jojs.ExecutionResult;
-import tw.edu.ncku.csie.selab.jojs.ExecutionTask;
 import tw.edu.ncku.csie.selab.jojs.JOJS;
 import tw.edu.ncku.csie.selab.jojs.JudgeException;
 import tw.edu.ncku.csie.selab.jojs.JudgeResult;
+import tw.edu.ncku.csie.selab.jojs.judger.Judger;
 import tw.edu.ncku.csie.selab.jojs.judger.OfflineJudger;
 
 public class OfflineJudgement {
@@ -33,7 +33,7 @@ public class OfflineJudgement {
             System.exit(0);
         }
         String hwID = args[0];
-        ExecutionTask.Mode mode = ExecutionTask.Mode.parseMode(args[1]);
+        Judger.Mode mode = args[1].equals("standard") ? Judger.Mode.STANDARD : Judger.Mode.STDIN;
         int base = Integer.parseInt(args[2]);
 
         // Choose source directory
