@@ -36,16 +36,19 @@ public class RuleParser {
     }
 
     public static synchronized String getDescription(Map<String, List<MethodRule>> ruleMap) {
-        StringBuilder builder = new StringBuilder("Your code should contain at least: \n\n");
+        StringBuilder builder = new StringBuilder("Your code should contain at least the following classes and methods: \n\n");
         for (Map.Entry<String, List<MethodRule>> rule : ruleMap.entrySet()) {
             builder.append("class ").append(rule.getKey()).append(" { \n");
             for (MethodRule methodRule : rule.getValue()) {
                 builder.append("    ");
                 builder.append(methodRule.returnType).append(" ");
                 builder.append(methodRule.name).append(" (");
-                for (String type : methodRule.parameterTypes)
-                    builder.append(type).append(", ");
-                builder.delete(builder.lastIndexOf(","), builder.length()).append("); \n");
+                if (methodRule.parameterTypes.size() > 0) {
+                    for (String type : methodRule.parameterTypes)
+                        builder.append(type).append(", ");
+                    builder.delete(builder.lastIndexOf(","), builder.length());
+                }
+                builder.append("); \n");
             }
             builder.append("} \n\n");
         }
