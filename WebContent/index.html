@@ -23,11 +23,11 @@
             </label>
         </span>
         <input type="file" name="file" id="file" accept=".zip" onchange="validateForm()" style="display: none;" />
-        <input type="text" id="studentID" name="studentID" title="Student ID" placeholder="Student ID" class="studentID" maxlength="9" size="9" readonly />
+        <input type="text" id="studentID" name="studentID" title="Student ID" placeholder="Student ID" maxlength="9" size="9" readonly />
 
         <!-- HW ID -->
         <select id="hwID" name="hwID" title="Homework ID">
-            <option value="hw1" selected>hw1</option>
+            <option value="hw1" >hw1</option>
         </select>
 
         <!-- Mode -->
@@ -37,10 +37,10 @@
         </select>
 
         <!-- Submit -->
-        <input id="btn_submit" type="submit" value="SUBMIT" class="btn_disabled" disabled />
+        <input id="btn_submit" type="submit" value="SUBMIT" class="btn_submit" disabled />
     </form>
     <!-- Project site -->
-    <span class="project_site"><a href="https://github.com/smilecatx3/Java-Online-Judge-System" target="_blank">JOJS Project v3.1.0</a></span>
+    <span class="project_site"><a href="https://github.com/smilecatx3/Java-Online-Judge-System" target="_blank">JOJS Project v3.1.2</a></span>
 </div>
 
 <iframe id="judge" name="judge" width="100%" class="iFrame" scrolling="no" onload="setIFrameHeight()" />

@@ -21,13 +21,13 @@ function validateForm() {
 		if (new RegExp(/[A-Z][0-9]{8}/).test(studentID)) {
 			form["studentID"].value = studentID;
 			button.removeAttribute("disabled");
-			button.className = "btn_submit";
+			button.className = "btn_submit btn_submit_enabled";
 			return;
 		}
 	}
 	form["studentID"].value = "";
 	button.setAttribute("disabled", true);
-	button.className = "btn_disabled";
+	button.className = "btn_submit";
 	if (file.length > 0)
 	    alert("Wrong Student ID");
 }
@@ -38,10 +38,10 @@ function submitForm() {
 	
 	// Disable submit button for a while
 	button.setAttribute("disabled", true);
-	button.className = "btn_disabled";
+	button.className = "btn_submit";
 	setTimeout(function() {
 			button.removeAttribute("disabled");
-			button.className = "btn_submit";
+			button.className = "btn_submit btn_submit_enabled";
 		}, 1000);
 	// Submit form
 	form.action = "judge.jsp";
