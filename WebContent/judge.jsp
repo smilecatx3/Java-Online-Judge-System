@@ -18,7 +18,7 @@
 <head>
     <link rel="stylesheet" type="text/css" href="css/judge.css">
 </head>
-<body>
+<body onresize="setHeight()">
 
 <%!
     String printJsonArray(JSONArray array) {
@@ -29,8 +29,8 @@
     }
 %>
 
-<script src="js/progressbar.js"></script>
-<script src="js/jquery.min.js"></script>
+<script src="js/lib/progressbar.js"></script>
+<script src="js/lib/jquery.min.js"></script>
 <script src="js/judge.js"></script>
 
 <div class="status"> 

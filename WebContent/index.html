@@ -5,33 +5,45 @@
 	<title>Java Homework Online Judge System</title>
 	<link rel="shortcut icon" href="resource/favicon.ico">
 	<link rel="stylesheet" type="text/css" href="css/index.css">
-</head>	
-<body link="blue" vlink="blue" onresize="setIFrameHeight();">
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/index.js"></script>
+</head>
 
-<script src="js/prototype.js"></script>
-<script src="js/index.js"></script>
-	
-<font class="title"> Java Online Judge System </font>
-<p>
+<body onload="setIFrameHeight()" onresize="setIFrameHeight()">
 
-<form id="form" name="form" enctype="multipart/form-data" method="POST" onsubmit="submitForm()" target="judge">
-	<select id="hwID" name="hwID" title="Homework ID">
-		<option value="hw1" selected>hw1</option>
-		<option value="demo1">demo1</option>
-		<option value="demo2">demo2</option>
-		<option value="demo3">demo3</option>
-	</select>　　
-	<select id="mode" name="mode" title="Execution Mode">
-		<option value="standard">standard</option>
-		<option value="stdin">stdin</option>
-	</select>　　
-	<input type="file" name="file" title="Input File" accept=".zip" onchange="validateForm()" class="file" />　　
-	<input type="text" id="studentID" name="studentID" title="Student ID" placeholder="Student ID" class="studentID" maxlength="9" size="9" readonly />　　
-	<input id="btn_submit" type="submit" value="SUBMIT" class="btn_disabled" disabled />
-</form>
-<hr>
+<div id="top">
+    <div class="title">Java Online Judge System</div>
 
-<iframe id="judge" name="judge" onload="setIFrameHeight();" width="85%" class="iFrame" />
+    <form id="form" name="form" enctype="multipart/form-data" method="POST" onsubmit="submitForm()" target="judge">
+        <!-- Upload -->
+        <span class="upload_container btn_upload" onclick="return upload();">
+            <label>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"/></svg>
+                <span>Upload</span>
+            </label>
+        </span>
+        <input type="file" name="file" id="file" accept=".zip" onchange="validateForm()" style="display: none;" />
+        <input type="text" id="studentID" name="studentID" title="Student ID" placeholder="Student ID" class="studentID" maxlength="9" size="9" readonly />
+
+        <!-- HW ID -->
+        <select id="hwID" name="hwID" title="Homework ID">
+            <option value="hw1" selected>hw1</option>
+        </select>
+
+        <!-- Mode -->
+        <select id="mode" name="mode" title="Execution Mode">
+            <option value="standard" selected>args</option>
+            <option value="stdin">stdin</option>
+        </select>
+
+        <!-- Submit -->
+        <input id="btn_submit" type="submit" value="SUBMIT" class="btn_disabled" disabled />
+    </form>
+    <!-- Project site -->
+    <span class="project_site"><a href="https://github.com/smilecatx3/Java-Online-Judge-System" target="_blank">JOJS Project v3.1.0</a></span>
+</div>
+
+<iframe id="judge" name="judge" width="100%" class="iFrame" scrolling="no" onload="setIFrameHeight()" />
 
 </body>
 </html>

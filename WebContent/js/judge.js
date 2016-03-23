@@ -2,14 +2,14 @@ var progressCircle;
 
 function drawProgressCircle() {
 	progressCircle = new ProgressBar.Circle('#progress', {
-		color: '#15CB08',
+		color: '#71AAE3',
 		strokeWidth: 3,
 		trailWidth: 1,
 		duration: 500,
 		text: {
 			value: '0',
 			style : {
-				color: '#4ACF1E',
+				color: '#5193D5',
 				position: 'absolute',
 				left: '50%',
 				top: '50%',
@@ -49,6 +49,7 @@ function showErrorMessage(errorCode, message) {
 	var div = document.getElementById('judge_error');
 	$(div).fadeIn(300);
 	div.innerHTML = message;
+	setHeight();
 }
 
 function showJudgeResult(hwID, numPassed, numTestCases, score, runTime) {
@@ -68,7 +69,7 @@ function showJudgeResult(hwID, numPassed, numTestCases, score, runTime) {
 	
 	// Show summary
 	var div_summary = document.getElementById("summary");
-	$(div_summary).slideDown(500);
+	$(div_summary).slideDown({duration: 500, progress: setHeight});
 }
 
 function showDetail(id) {
@@ -84,23 +85,29 @@ function showDetail(id) {
 		});
 		if (isAllExpanded) {
 			$('[id^="io_show_"]').each(function() {
-				$(this).slideUp(duration);
+				$(this).slideUp({duration: duration, progress: setHeight});
 			});
 			$('[id^="io_collapse"]').each(function() {
-				$(this).slideDown(duration);
+				$(this).slideDown({duration: duration, progress: setHeight});
 			});
 		} else {
 			$('[id^="io_show_"]').each(function() {
-				$(this).slideDown(duration);
+				$(this).slideDown({duration: duration, progress: setHeight});
 			});
 			$('[id^="io_collapse"]').each(function() {
-				$(this).slideUp(duration);
+				$(this).slideUp({duration: duration, progress: setHeight});
 			});
 		}
 	} else {
 		var io_show = "io_show_"+id;
 		var io_collapse = "io_collapse_"+id;
-		$('[id='+io_show+']').slideToggle(duration);
-		$('[id='+io_collapse+']').slideToggle(duration);
+		$('[id='+io_show+']').slideToggle({duration: duration, progress: setHeight});
+		$('[id='+io_collapse+']').slideToggle({duration: duration, progress: setHeight});
 	}
+}
+
+function setHeight() {
+	var height = $('.status').height() + $('#judge_error').height() + $('#judge_result').height() + $('#summary').height() + 100;
+	height = Math.max(height, 500);
+	window.parent.postMessage(["setHeight", height], "*"); 
 }

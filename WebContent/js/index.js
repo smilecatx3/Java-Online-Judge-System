@@ -1,9 +1,14 @@
+window.addEventListener('message', function(e) {
+	var eventName = e.data[0];
+	var data = e.data[1];
+	if (eventName === 'setHeight') {
+		$('#judge').css("height", data+"px");
+	}
+}, false);
+
 function setIFrameHeight() {
-	var iFrame = document.getElementById("judge");
-	var frameTop = iFrame.getBoundingClientRect().top;
-	var bodyBottom = document.body.getBoundingClientRect().bottom;
-	var height = bodyBottom - frameTop - 50;
-	iFrame.setStyle({height: height+"px"});
+	var padding = $("#top").height()+30;
+    $('#judge').css("padding-top", padding+"px");
 }
 
 function validateForm() {
@@ -23,6 +28,8 @@ function validateForm() {
 	form["studentID"].value = "";
 	button.setAttribute("disabled", true);
 	button.className = "btn_disabled";
+	if (file.length > 0)
+	    alert("Wrong Student ID");
 }
 
 function submitForm() {
@@ -38,4 +45,8 @@ function submitForm() {
 		}, 1000);
 	// Submit form
 	form.action = "judge.jsp";
+}
+
+function upload() {
+	document.getElementById("file").click();
 }
