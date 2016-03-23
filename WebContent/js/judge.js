@@ -21,6 +21,7 @@ function drawProgressCircle() {
 			bar.setText((bar.value() * 100).toFixed(0)+"%");
 		}
 	});
+	setHeight();
 }
 
 function removeProgressCircle() {
@@ -39,7 +40,7 @@ function showStatus(message, color) {
 
 function showProgress(progress, message) {
 	var speed = message.includes("Compiling") ? 1000 : 200;
-	showStatus(message, "#0B9FC9");
+	showStatus(message, "#5B8AE8");
 	progressCircle.animate(progress, {duration: speed});
 }
 
@@ -54,7 +55,7 @@ function showErrorMessage(errorCode, message) {
 
 function showJudgeResult(hwID, numPassed, numTestCases, score, runTime) {
 	removeProgressCircle();
-	showStatus('Finished', '#11BA5D');
+	showStatus('Finished', '#28B25F');
 	
 	// Show judge result
 	var percentPassed = (numPassed/numTestCases * 100.0).toFixed(0);

@@ -32,10 +32,10 @@ body {
 
 .title {
 	font-family: Lucida Sans Unicode; 
-	font-size: 40px; 
+	font-size: 36px; 
 	font-weight: bold; 
 	color: #5A8FDF;
-	text-shadow: 3px 3px 3px #CCCCCC;
+	text-shadow: 2px 2px 3px #CCCCCC;
 	padding-top: 10px;
 	padding-bottom: 20px;
 }
@@ -106,18 +106,24 @@ body {
 	padding-right: 3px;
 	margin-left: 15px;
 	margin-right: 15px;
+	border-radius: 5px;
+	text-align: center;
+	background-color: #FCFCFC;
 }
 
 
 
 /* Select hw id & mode */
 select {
-	font-family: Lucida Sans Unicode;
-	font-size: 16px;
-	height: 28px;
-	box-shadow: 0.5px 0.5px 1px 1px #96A6FF;
+	//height: 28px;
 	margin-left: 15px;
 	margin-right: 15px;
+	padding: 0px 3px 0px 3px;
+	border-radius: 5px;
+	border: 1px groove #96A6FF;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font-size: 16px;
+	background-color: #FCFCFC;
 }
 
 
