@@ -5,6 +5,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class ProcessExecutor {
@@ -22,6 +26,7 @@ public class ProcessExecutor {
 
     private long timeout;
 
+    // TODO may need global timeout (it's too slow)
     public ProcessExecutor() {
         this(5000L);
     }
@@ -38,19 +43,25 @@ public class ProcessExecutor {
         long start = System.currentTimeMillis();
         Process process = processBuilder.start();
 
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<String> future = executorService.submit(() -> IOUtils.toString(process.getInputStream(), "UTF-8"));
+
         try {
-            if (!process.waitFor(timeout, TimeUnit.MILLISECONDS)) {
+            boolean hasExisted = process.waitFor(timeout, TimeUnit.MILLISECONDS);
+            if (hasExisted) {
+                return new Result(future.get(), System.currentTimeMillis() - start, false);
+            } else {
+                future.cancel(true);
                 process.destroyForcibly();
                 return new Result(null, timeout, true);
-            } else {
-                return new Result(IOUtils.toString(process.getInputStream(), "UTF-8"), System.currentTimeMillis() - start, false);
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return new Result(ExceptionUtils.getMessage(e), 0, false);
         } finally {
             if (process.isAlive())
                 process.destroyForcibly();
+            executorService.shutdownNow();
         }
     }
 
