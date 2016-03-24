@@ -33,9 +33,7 @@ body {
 .title {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	font-size: 32px; 
-	//font-weight: bold; 
 	color: #FCFCFC;
-	//text-shadow: 2px 2px 5px #E5E5E5;
 	padding-top: 10px;
 	padding-bottom: 20px;
 }
@@ -86,7 +84,6 @@ body {
 	text-decoration: none;
 	display: inline-table;
 	text-align:center;
-	//border: 2px groove #C6DCFF;
 }
 
 .btn_upload:hover {
@@ -130,26 +127,21 @@ select {
 .btn_submit {
 	font-family: Lucida Console;
 	font-size: 18px;
-	padding: 8px 15px 8px 15px;
+	padding: 7px 13px 7px 13px;
 	text-decoration: none;
 	margin-left: 15px;
 	margin-right: 15px;
 	border: 1px solid #4579CE;
-	border-radius: 10px;
+	border-radius: 25px;
 	color: #B7B7B7;
 	background: #E6E6E6;
 }
 
 .btn_submit_enabled {
 	background: #12AE3E;
-	color: #FFFFFF;
+	color: #FCFCFC;
 }
 
 .btn_submit_enabled:hover {
-	background: #14a341;
-	background-image: -webkit-linear-gradient(top, #14a341, #0a8a32);
-	background-image: -moz-linear-gradient(top, #14a341, #0a8a32);
-	background-image: -ms-linear-gradient(top, #14a341, #0a8a32);
-	background-image: -o-linear-gradient(top, #14a341, #0a8a32);
-	background-image: linear-gradient(to bottom, #14a341, #0a8a32);
+	background-image: linear-gradient(to bottom, #12AE3E, #119D39);
 }
