@@ -106,6 +106,7 @@ public class InputCreator extends JFrame {
 	}
 
     private boolean validateProjectFolder() {
+        // TODO exception will occur if project root folder contains java file
         List<File> srcFiles = new ArrayList<>(FileUtils.listFiles(projectFolder, new String[] {"java"}, true));
         classFiles = new ArrayList<>(FileUtils.listFiles(projectFolder, new String[] {"class"}, true));
         if (srcFiles.size() * classFiles.size() == 0) {

@@ -26,9 +26,8 @@ public class ProcessExecutor {
 
     private long timeout;
 
-    // TODO may need global timeout (it's too slow)
     public ProcessExecutor() {
-        this(5000L);
+        this(JOJS.CONFIG.getLong("timeout"));
     }
 
     public ProcessExecutor(long timeout) {

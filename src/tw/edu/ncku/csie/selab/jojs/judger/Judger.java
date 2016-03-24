@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import tw.edu.ncku.csie.selab.jojs.CompilationTask;
 import tw.edu.ncku.csie.selab.jojs.ExecutionTask;
@@ -48,15 +53,24 @@ public abstract class Judger {
     public JudgeResult judge(Mode mode) throws Exception {
         validateInput();
 
-        // Compile
-        reporter.reportProgress(0.5, "Compiling");
-        new CompilationTask(srcFolder, binFolder).execute();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<JudgeResult> future = executorService.submit(() -> {
+            // Compile
+            reporter.reportProgress(0.5, "Compiling");
+            new CompilationTask(srcFolder, binFolder).execute();
+            // Execute
+            File testcase = new File(JOJS.CONFIG.getString("testcase_dir"), hwID+".json");
+            return new ExecutionTask(testcase, binFolder, entryPoint, mode, reporter).execute();
+        });
 
-        // Execute
-        return new ExecutionTask(
-                    new File(JOJS.CONFIG.getString("testcase_dir"), hwID+".json"),
-                    binFolder, entryPoint, mode, reporter)
-                .execute();
+        try {
+            return future.get(JOJS.CONFIG.getLong("timeout"), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            throw new JudgeException("Time limit exceeded", JudgeException.ErrorCode.TIME_LIMIT_EXCEEDED);
+        } finally {
+            future.cancel(true);
+            executorService.shutdownNow();
+        }
     }
 
     public void clean() {
