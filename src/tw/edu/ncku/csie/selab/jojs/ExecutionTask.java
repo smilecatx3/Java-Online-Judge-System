@@ -80,6 +80,9 @@ public class ExecutionTask {
                 results[i] = new ExecutionResult(passed, answer);
             }
             elapsedTime += result.runtime;
+
+            if (elapsedTime >= JOJS.CONFIG.getLong("timeout"))
+                throw new JudgeException("Time limit exceeded", JudgeException.ErrorCode.TIME_LIMIT_EXCEEDED);
         }
         return new JudgeResult(testcase, results, elapsedTime/results.length);
     }
