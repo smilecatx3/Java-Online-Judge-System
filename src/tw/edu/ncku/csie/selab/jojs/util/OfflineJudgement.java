@@ -22,6 +22,7 @@ import tw.edu.ncku.csie.selab.jojs.JudgeResult;
 import tw.edu.ncku.csie.selab.jojs.judger.Judger;
 import tw.edu.ncku.csie.selab.jojs.judger.OfflineJudger;
 
+// TODO add GUI
 public class OfflineJudgement {
 
     public static void main(String args[]) throws Exception {
@@ -97,8 +98,6 @@ public class OfflineJudgement {
             }
         } catch (Exception e) {
             out.println(ExceptionUtils.getStackTrace(e));
-        } finally {
-            JOJS.executor.shutdownNow();
         }
     }
 

@@ -13,7 +13,8 @@ import tw.edu.ncku.csie.selab.jojs.judger.Judger;
 public class JOJS {
     public static final JSONObject CONFIG;
     public static final String JAVA;
-    public static ExecutorService executor;
+    private static ExecutorService executor;
+    private static int numRunningThreads = 0;
 
     static {
         JSONObject temp = null;
@@ -25,15 +26,21 @@ public class JOJS {
         }
         CONFIG = temp;
         JAVA = CONFIG.getString("java");
-        executor = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
     }
 
     public synchronized static Future<JudgeResult> judge(Judger judger, Judger.Mode mode) {
+        if (numRunningThreads == 0)
+            executor = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
+
         return executor.submit(() -> {
             try {
+                numRunningThreads++;
                 return judger.judge(mode);
             } finally {
                 judger.clean();
+                numRunningThreads--;
+                if (numRunningThreads == 0)
+                    executor.shutdownNow();
             }
         });
     }
