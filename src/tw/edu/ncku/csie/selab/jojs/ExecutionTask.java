@@ -38,12 +38,12 @@ public class ExecutionTask {
     }
 
     public JudgeResult execute() throws Exception {
-        ProcessExecutor executor = testcase.has("timeout") ?
-                new ProcessExecutor(testcase.getLong("timeout")) :
-                new ProcessExecutor();
         JSONArray inputs = testcase.getJSONArray("inputs");
         JSONArray outputs = testcase.getJSONArray("outputs");
+        long globalTimeout = testcase.has("timeout") ? testcase.getLong("timeout")*outputs.length() : JOJS.CONFIG.getLong("timeout");
+        ProcessExecutor executor = testcase.has("timeout") ? new ProcessExecutor(testcase.getLong("timeout")) : new ProcessExecutor();
 
+        //TODO refactoring (extract)
         if (testcase.has("rules")) {
             Map<String, List<MethodRule>> ruleMap = RuleParser.parse(testcase.getJSONArray("rules"));
             if (!validateClass(ruleMap))
@@ -81,7 +81,7 @@ public class ExecutionTask {
             }
             elapsedTime += result.runtime;
 
-            if (elapsedTime >= JOJS.CONFIG.getLong("timeout"))
+            if (elapsedTime >= globalTimeout)
                 throw new JudgeException("Time limit exceeded", JudgeException.ErrorCode.TIME_LIMIT_EXCEEDED);
         }
         return new JudgeResult(testcase, results, elapsedTime/results.length);
