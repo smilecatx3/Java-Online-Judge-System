@@ -6,20 +6,13 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import tw.edu.ncku.csie.selab.jojs.judger.Judger;
 import tw.edu.ncku.csie.selab.jojs.judger.ProgressReporter;
-import tw.edu.ncku.csie.selab.jojs.rule.MethodRule;
-import tw.edu.ncku.csie.selab.jojs.rule.RuleParser;
+import tw.edu.ncku.csie.selab.jojs.rule.RuleValidator;
 
 public class ExecutionTask {
     private JSONObject testcase;
@@ -43,11 +36,10 @@ public class ExecutionTask {
         long globalTimeout = testcase.has("timeout") ? testcase.getLong("timeout")*outputs.length() : JOJS.CONFIG.getLong("timeout");
         ProcessExecutor executor = testcase.has("timeout") ? new ProcessExecutor(testcase.getLong("timeout")) : new ProcessExecutor();
 
-        //TODO refactoring (extract)
         if (testcase.has("rules")) {
-            Map<String, List<MethodRule>> ruleMap = RuleParser.parse(testcase.getJSONArray("rules"));
-            if (!validateClass(ruleMap))
-                throw new JudgeException(RuleParser.getDescription(ruleMap), JudgeException.ErrorCode.INVALID_CLASS);
+            RuleValidator validator = new RuleValidator(binFolder, testcase.getJSONArray("rules"));
+            if (!validator.isValid())
+                throw new JudgeException(validator.getRule(), JudgeException.ErrorCode.INVALID_CLASS);
         }
 
         double elapsedTime = 0;
@@ -96,40 +88,5 @@ public class ExecutionTask {
         FileUtils.writeStringToFile(file, data.toString());
         return file;
     }
-
-    private boolean validateClass(Map<String, List<MethodRule>> ruleMap) throws MalformedURLException, ClassNotFoundException {
-        // Load all classes under the bin folder
-        ClassLoader classLoader = new URLClassLoader(new URL[]{binFolder.toURI().toURL()});
-        Map<String, Map<String, Method>> classMap = new HashMap<>(); // [class_name, [method_name, method]]
-        for (File file : FileUtils.listFiles(binFolder, new String[] {"class"}, true)) {
-            String className = file.getAbsolutePath()
-                    .replace(binFolder.getAbsolutePath(), "")
-                    .replace(File.separator, ".")
-                    .replace(".class", "");
-            Class c = classLoader.loadClass(className.startsWith(".") ? className.substring(1) : className);
-            Method[] methods = c.getDeclaredMethods();
-            Map<String, Method> methodMap = new HashMap<>();
-            for (Method method : methods)
-                methodMap.put(method.getName(), method);
-            classMap.put(c.getSimpleName(), methodMap);
-        }
-
-        // Validate
-        for (Map.Entry<String, List<MethodRule>> rule : ruleMap.entrySet()) {
-            String className = rule.getKey();
-            List<MethodRule> methodRules = rule.getValue();
-
-            if (classMap.containsKey(className)) {
-                Map<String, Method> methodMap = classMap.get(className);
-                for (MethodRule methodRule : methodRules)
-                    if (!methodRule.equals(methodMap.get(methodRule.name)))
-                        return false;
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
 }
