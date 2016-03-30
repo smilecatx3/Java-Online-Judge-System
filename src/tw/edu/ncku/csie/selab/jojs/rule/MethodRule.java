@@ -23,6 +23,7 @@ public class MethodRule {
 
     public boolean equals(Method method) {
         boolean isEqual =
+                method != null &&
                 method.getName().equals(name) &&
                 method.getReturnType().getName().equals(returnType) &&
                 method.getParameterCount() == parameterTypes.size();
