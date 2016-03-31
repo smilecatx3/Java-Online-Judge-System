@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +15,12 @@ import it.zielke.moji.SocketClient;
 
 public class PlagiarismDetector {
     private SocketClient socketClient;
-    private PrintStream out;
 
-    public PlagiarismDetector(String mossUserID, PrintStream out) throws MossException, IOException {
+    public PlagiarismDetector(String mossUserID) throws MossException, IOException {
         socketClient = new SocketClient();
         socketClient.setUserID(mossUserID);
         socketClient.setLanguage("java");
         socketClient.run();
-        this.out = out;
     }
 
     public String start(String files) throws MossException, ZipException, IOException {
@@ -35,9 +32,9 @@ public class PlagiarismDetector {
 
     public String start(List<File> files) throws IOException, ZipException, MossException {
         File tempDir = new File(FileUtils.getTempDirectory(), "moss");
-        out.println("[MOSS] Start");
-        out.println("[MOSS] Working directory: " + tempDir);
-        out.println("[MOSS] Input files: " + files);
+        System.out.println("[MOSS] Start");
+        System.out.println("[MOSS] Working directory: " + tempDir);
+        System.out.println("[MOSS] Input files: " + files);
 
         if (tempDir.exists())
             FileUtils.forceDelete(tempDir);
