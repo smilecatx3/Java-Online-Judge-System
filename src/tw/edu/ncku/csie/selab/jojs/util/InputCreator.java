@@ -18,8 +18,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -49,98 +47,124 @@ public class InputCreator extends JFrame {
 
 
     private JComboBox<String> comboBox_mainClass;
-    private JTextField textField_projectFolder;
+    private JTextField textField_srcFolder;
     private JFileChooser fileChooser;
     private JButton btn_create;
 
-    private File projectFolder = new File(System.getProperty("user.dir"));
-    private File projectSrcFolder;
-    private List<File> classFiles;
+    private File srcFolder, binFolder;
+    private String[] srcFilter = {"java"};
+    private String[] binFilter = {"class"};
 
 
-	public InputCreator() {
-		setResizable(false);
-		setTitle("Input Creator");
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setBounds(100, 100, 400, 150);
-        JPanel contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
+	private InputCreator() {
+        drawComponents();
 
+        // Init file chooser
         fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(projectFolder);
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		textField_projectFolder = new JTextField();
-		textField_projectFolder.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		textField_projectFolder.setBackground(Color.WHITE);
-		textField_projectFolder.setEditable(false);
-		textField_projectFolder.setBounds(10, 10, 341, 21);
-        textField_projectFolder.setColumns(10);
-        if (validateProjectFolder())
-            textField_projectFolder.setText(projectFolder.getAbsolutePath());
-		contentPane.add(textField_projectFolder);
+        setSrcFolder(fileChooser.getCurrentDirectory());
+        setBinFolder(fileChooser.getCurrentDirectory());
+	}
+
+    private void drawComponents() {
+        setResizable(false);
+        setTitle("Input Creator");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setBounds(100, 100, 400, 150);
+        JPanel contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+
+        // Src components
+        JButton btn_srcFolder = new JButton("...");
+        btn_srcFolder.setToolTipText("Select src folder");
+        btn_srcFolder.setBounds(361, 10, 23, 23);
+        btn_srcFolder.addActionListener(this::selectSrcFolder);
+        contentPane.add(btn_srcFolder);
+
+        textField_srcFolder = new JTextField();
+        textField_srcFolder.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        textField_srcFolder.setEditable(false);
+        textField_srcFolder.setColumns(10);
+        textField_srcFolder.setBackground(Color.WHITE);
+        textField_srcFolder.setBounds(10, 10, 341, 21);
+        contentPane.add(textField_srcFolder);
+
+        // Bin components
+        JButton btn_binFolder = new JButton("...");
+        btn_binFolder.setToolTipText("Select bin folder");
+        btn_binFolder.setBounds(361, 43, 23, 23);
+        btn_binFolder.addActionListener(this::selectBinFolder);
 
         comboBox_mainClass = new JComboBox<>();
         comboBox_mainClass.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        comboBox_mainClass.setBounds(10, 41, 341, 21);
+        comboBox_mainClass.setBounds(10, 44, 341, 21);
         contentPane.add(comboBox_mainClass);
+        contentPane.add(btn_binFolder);
 
-        JButton btn_chooseProjectFolder = new JButton("...");
-		btn_chooseProjectFolder.setBounds(361, 9, 23, 23);
-        btn_chooseProjectFolder.addActionListener(this::chooseProjectFolder);
-		contentPane.add(btn_chooseProjectFolder);
-
-        JButton btn_chooseBinFolder = new JButton("...");
-        btn_chooseBinFolder.setBounds(361, 42, 23, 23);
-        btn_chooseBinFolder.addActionListener(this::chooseBinFolder);
-        contentPane.add(btn_chooseBinFolder);
-
+        // Create button
         btn_create = new JButton("CREATE");
         btn_create.setEnabled(false);
         btn_create.setFont(new Font("Monospaced", Font.PLAIN, 16));
-        btn_create.setBounds(120, 72, 150, 40);
+        btn_create.setBounds(119, 75, 150, 40);
         btn_create.addActionListener(this::create);
         contentPane.add(btn_create);
-	}
+    }
 
-    private boolean validateProjectFolder() {
-        // TODO exception will occur if project root folder contains java file
-        List<File> srcFiles = new ArrayList<>(FileUtils.listFiles(projectFolder, new String[] {"java"}, true));
-        classFiles = new ArrayList<>(FileUtils.listFiles(projectFolder, new String[] {"class"}, true));
-        if (srcFiles.size() * classFiles.size() == 0) {
-            JOptionPane.showMessageDialog(null, "Your project directory should contain both source files (*.java) and class files (*.class)");
-            return false;
-        } else {
-            String srcRoot = srcFiles.get(0).getAbsolutePath()
-                    .substring(projectFolder.getAbsolutePath().length())
-                    .replace(File.separator, " ").trim();
-            srcRoot = srcRoot.substring(0, srcRoot.indexOf(" "));
-            projectSrcFolder = new File(projectFolder, srcRoot);
-            return true;
+    private void setSrcFolder(File root) {
+        File srcFolder = new File(root, "src");
+        if (validateFolder(srcFolder, srcFilter, false)) {
+            this.srcFolder = srcFolder;
+            textField_srcFolder.setText(srcFolder.getAbsolutePath());
         }
     }
 
-    private void chooseProjectFolder(ActionEvent event) {
+    private void setBinFolder(File root) {
+        // eclipse default
+        File binFolder = new File(root, "bin");
+        if (validateFolder(binFolder, binFilter, false)) {
+            this.binFolder = binFolder;
+            setMainClassList();
+            return;
+        }
+
+        // Intellij IDEA default
+        File[] folders = new File(root, "out/production").listFiles();
+        if (folders != null && folders.length > 0)
+            binFolder = folders[0];
+        if (validateFolder(binFolder, binFilter, false)) {
+            this.binFolder = binFolder;
+            setMainClassList();
+        }
+    }
+
+    private void selectSrcFolder(ActionEvent event) {
         if (fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
             return;
-        projectFolder = fileChooser.getSelectedFile();
-        if (validateProjectFolder()) {
-            textField_projectFolder.setText(projectFolder.getAbsolutePath());
-            comboBox_mainClass.removeAllItems();
+        srcFolder = fileChooser.getSelectedFile();
+        if (validateFolder(srcFolder, srcFilter)) {
             btn_create.setEnabled(false);
+            textField_srcFolder.setText(srcFolder.getAbsolutePath());
+            comboBox_mainClass.removeAllItems();
+            setBinFolder(srcFolder.getParentFile());
         }
     }
 
-    private void chooseBinFolder(ActionEvent event) {
+    private void selectBinFolder(ActionEvent event) {
         if (fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
             return;
-        // Set main class list
+        binFolder = fileChooser.getSelectedFile();
+        if (validateFolder(binFolder, binFilter))
+            setMainClassList();
+    }
+
+    private void setMainClassList() {
         try {
-            File binFolder = fileChooser.getSelectedFile();
             ClassLoader classLoader = new URLClassLoader(new URL[]{binFolder.toURI().toURL()});
-            for (File file : classFiles) {
+            for (File file : FileUtils.listFiles(binFolder, binFilter, true)) {
                 String className = file.getAbsolutePath()
                         .replace(binFolder.getAbsolutePath(), "")
                         .replace(File.separator, ".")
@@ -166,8 +190,6 @@ public class InputCreator extends JFrame {
 
     private void create(ActionEvent event) {
         try {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(projectFolder);
             if (fileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION)
                 return;
             File output = fileChooser.getSelectedFile();
@@ -191,7 +213,7 @@ public class InputCreator extends JFrame {
             FileUtils.writeStringToFile(manifest,
                     "Manifest-Version: 1.0\n" +
                     String.format("Main-Class: %s\n", comboBox_mainClass.getSelectedItem()));
-            FileUtils.copyDirectory(projectSrcFolder, srcFolder);
+            FileUtils.copyDirectory(this.srcFolder, srcFolder);
 
             ZipFile zip = new ZipFile(output);
             ZipParameters parameters = new ZipParameters();
@@ -208,4 +230,18 @@ public class InputCreator extends JFrame {
         }
     }
 
+    private boolean validateFolder(File folder, String[] filter) {
+        return validateFolder(folder, filter, true);
+    }
+
+    private boolean validateFolder(File folder, String[] filter, boolean showMessage) {
+        assert filter.length > 0;
+        if (folder.exists() && folder.isDirectory() && FileUtils.listFiles(folder, filter, true).size() > 0) {
+            return true;
+        } else {
+            if (showMessage)
+                JOptionPane.showMessageDialog(null, String.format("The directory should contain .%s files", filter[0]));
+            return false;
+        }
+    }
 }
