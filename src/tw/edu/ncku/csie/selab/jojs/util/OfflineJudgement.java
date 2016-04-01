@@ -68,7 +68,7 @@ public class OfflineJudgement extends JFrame {
     private JProgressBar progressBar;
 
     private StringBuilder summary;
-    private String mossID;
+    private String mossID = "";
 
 
 	public OfflineJudgement() throws UnsupportedEncodingException {
@@ -175,12 +175,16 @@ public class OfflineJudgement extends JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	}
 
-    // TODO moss id display
     private void setMossID(ActionEvent event) {
         if (moss.isSelected()) {
-            String inputValue = JOptionPane.showInputDialog("Please input your MOSS ID");
-            if (inputValue != null && inputValue.length() > 0)
+            String inputValue = JOptionPane.showInputDialog("Please input your MOSS ID", mossID);
+            if (inputValue != null && inputValue.length() > 0) {
                 mossID = inputValue;
+                moss.setText(String.format("Moss (%s)", mossID));
+            } else {
+                moss.setSelected(false);
+                moss.setText("Moss");
+            }
         }
     }
 
@@ -271,19 +275,33 @@ public class OfflineJudgement extends JFrame {
             btn_save.setEnabled(true);
         }
 
+        progressBar.setValue(total);
         Toolkit.getDefaultToolkit().beep();
         JOptionPane.showMessageDialog(null, "Done");
-        progressBar.setValue(total);
     }
 
-    // TODO overwrite confirm
     private void save(ActionEvent event) {
         if (summary != null && summary.length() > 0) {
             JFileChooser chooser = new JFileChooser(fileChooser.getCurrentDirectory());
             chooser.setSelectedFile(new File(String.format("summary_%s.csv", hwID.getText())));
             if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 try {
-                    FileUtils.writeStringToFile(chooser.getSelectedFile(), summary.toString());
+                    File output = chooser.getSelectedFile();
+                    if (output.exists()) {
+                        int option = JOptionPane.showOptionDialog(null,
+                                "The file already exists. Do you want to overwrite it?", "File already exists",
+                                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                                null, null, null);
+                        switch (option) {
+                            case JOptionPane.YES_OPTION:
+                                FileUtils.forceDelete(output); break;
+                            case JOptionPane.NO_OPTION:
+                                save(event); return;
+                            default:
+                                return;
+                        }
+                    }
+                    FileUtils.writeStringToFile(output, summary.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

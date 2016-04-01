@@ -196,9 +196,9 @@ public class InputCreator extends JFrame {
             if (!output.getName().endsWith(".zip"))
                 output = new File(output.getParentFile(), output.getName()+".zip");
             if (output.exists()) {
-                int option = JOptionPane.showOptionDialog(null, "The file existed. It will be overwritten.", "File Existed",
+                int option = JOptionPane.showOptionDialog(null, "The file already exists. Do you want to overwrite it?", "File already exists",
                         JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE,
+                        JOptionPane.QUESTION_MESSAGE,
                         null, null, null);
                 if (option == JOptionPane.OK_OPTION)
                     FileUtils.forceDelete(output);
