@@ -36,4 +36,21 @@ public class MethodRule {
 
         return isEqual;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(returnType).append(" ");
+        builder.append(name).append("(");
+        if (parameterTypes.size() > 0) {
+            for (String type : parameterTypes)
+                builder.append(type).append(", ");
+            builder.delete(builder.lastIndexOf(","), builder.length()); // delete last comma
+        }
+        return builder.append("); \n").toString();
+    }
+
+    public String toString(String className) {
+        return toString().replaceFirst(" ", " "+className+".");
+    }
 }

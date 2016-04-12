@@ -11,12 +11,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RuleValidator {
     private File binFolder;
     private Map<String, List<MethodRule>> ruleMap = new HashMap<>();
+    private Set<String> absentClasses = new HashSet<>();
+    private Set<String> absentMethods = new HashSet<>();
 
     public RuleValidator(File binFolder, JSONArray rules) {
         this.binFolder = binFolder;
@@ -59,6 +63,7 @@ public class RuleValidator {
         }
 
         // Validate
+        boolean isValid = true;
         for (Map.Entry<String, List<MethodRule>> rule : ruleMap.entrySet()) {
             String className = rule.getKey();
             List<MethodRule> methodRules = rule.getValue();
@@ -66,32 +71,39 @@ public class RuleValidator {
             if (classMap.containsKey(className)) {
                 Map<String, Method> methodMap = classMap.get(className);
                 for (MethodRule methodRule : methodRules)
-                    if (!methodRule.equals(methodMap.get(methodRule.name)))
-                        return false;
+                    if (!methodRule.equals(methodMap.get(methodRule.name))) {
+                        absentMethods.add(methodRule.toString(className));
+                        isValid = false;
+                    }
             } else {
-                return false;
+                absentClasses.add(className);
+                isValid = false;
             }
         }
-        return true;
+        return isValid;
     }
 
     public String getRule() {
         StringBuilder builder = new StringBuilder("Your code should contain at least the following classes and methods: \n\n");
         for (Map.Entry<String, List<MethodRule>> rule : ruleMap.entrySet()) {
             builder.append("class ").append(rule.getKey()).append(" { \n");
-            for (MethodRule methodRule : rule.getValue()) {
-                builder.append("    ");
-                builder.append(methodRule.returnType).append(" ");
-                builder.append(methodRule.name).append(" (");
-                if (methodRule.parameterTypes.size() > 0) {
-                    for (String type : methodRule.parameterTypes)
-                        builder.append(type).append(", ");
-                    builder.delete(builder.lastIndexOf(","), builder.length());
-                }
-                builder.append("); \n");
-            }
+            for (MethodRule methodRule : rule.getValue())
+                builder.append("    ").append(methodRule.toString());
             builder.append("} \n\n");
         }
+
+        if (absentClasses.size() > 0) {
+            builder.append("\nAbsent classes: \n");
+            for (String name : absentClasses)
+                builder.append(name).append("\n");
+        }
+
+        if (absentMethods.size() > 0) {
+            builder.append("\nAbsent methods: \n");
+            for (String name : absentMethods)
+                builder.append(name).append("\n");
+        }
+
         return builder.toString().trim();
     }
 
