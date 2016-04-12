@@ -31,7 +31,7 @@ public class MethodRule {
         if (isEqual) {
             Class[] params = method.getParameterTypes();
             for (int i=0; i<parameterTypes.size(); i++)
-                isEqual = params[i].getName().equals(parameterTypes.get(i));
+                isEqual = isEqual && params[i].getName().equals(parameterTypes.get(i));
         }
 
         return isEqual;
