@@ -13,6 +13,8 @@ import tw.edu.ncku.csie.selab.jojs.judger.Judger;
 public class JOJS {
     public static final JSONObject CONFIG;
     public static final String JAVA;
+    private static final int MAX_THREADS; // Default = 4
+    private static final boolean CLEAN_UP; // Defaut = true
     private static ExecutorService executor;
     private static int numRunningThreads = 0;
 
@@ -26,6 +28,8 @@ public class JOJS {
         }
         CONFIG = temp;
         JAVA = CONFIG.getString("java");
+        MAX_THREADS = CONFIG.has("max_threads") ? CONFIG.getInt("max_threads") : 4;
+        CLEAN_UP = !CONFIG.has("cleanup") || CONFIG.getBoolean("cleanup");
     }
 
     public synchronized static Future<JudgeResult> judge(Judger judger, Judger.Mode mode) {
@@ -37,7 +41,7 @@ public class JOJS {
                 numRunningThreads++;
                 return judger.judge(mode);
             } finally {
-                if (CONFIG.getBoolean("cleanup"))
+                if (CLEAN_UP)
                     judger.clean();
                 numRunningThreads--;
                 if (numRunningThreads == 0)

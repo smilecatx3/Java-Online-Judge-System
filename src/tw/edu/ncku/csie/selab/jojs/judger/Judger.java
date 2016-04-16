@@ -39,10 +39,10 @@ public abstract class Judger {
         judgeTime = System.currentTimeMillis();
 
         // Create working directorty
-        if (JOJS.CONFIG.getString("working_dir").equals("auto"))
-            workingDirectory = new File(FileUtils.getTempDirectory(), String.format("jojs/%s/%s_%d", hwID, studentID, judgeTime));
-        else
+        if (JOJS.CONFIG.has("working_dir"))
             workingDirectory = new File(JOJS.CONFIG.getString("working_dir"), String.format("jojs/%s/%s_%d", hwID, studentID, judgeTime));
+        else
+            workingDirectory = new File(FileUtils.getTempDirectory(), String.format("jojs/%s/%s_%d", hwID, studentID, judgeTime));
         srcFolder = new File(workingDirectory, "src");
         binFolder = new File(workingDirectory, "bin");
         FileUtils.forceMkdir(binFolder);
