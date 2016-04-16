@@ -1,7 +1,9 @@
 {
-    "java" : "C:/Program Files/Java/jdk1.8.0_74/bin/java.exe",
+    "java" : "C:/Program Files/Java/jdk1.8.0_77/bin/java.exe",
     "ant_home" : "D:/Server/Tomcat8.0/webapps/jojs/WEB-INF/lib/apache-ant-1.9.6",
     "testcase_dir" : "D:/Server/Tomcat8.0/webapps/jojs/testcase",
     "max_thread" : 4,
-    "timeout" : 2500
+    "timeout" : 2500,
+    "cleanup" : false,
+    "working_dir" : "auto"
 }

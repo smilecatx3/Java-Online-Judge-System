@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 
 import tw.edu.ncku.csie.selab.jojs.CompilationTask;
@@ -27,28 +26,31 @@ public abstract class Judger {
     protected File workingDirectory;
 
 
-    protected Judger(String hwID, String studentID, ProgressReporter reporter) throws JudgeException, IOException {
+    protected Judger(String hwID, String studentID, ProgressReporter reporter) throws JudgeException {
         if (!studentID.matches("[A-Z][0-9]{8}"))
             throw new JudgeException("The student ID is invalid: " + studentID, JudgeException.ErrorCode.INVALID_STUDENT_ID);
 
         this.hwID = hwID;
         this.studentID = studentID;
         this.reporter = reporter;
-
-        // Create working directorty
-        workingDirectory = new File(FileUtils.getTempDirectory(), String.format("jojs/%s/%s_%d", hwID, studentID, System.currentTimeMillis()));
-        srcFolder = new File(workingDirectory, "src");
-        binFolder = new File(workingDirectory, "bin");
-        clean();
-        FileUtils.forceMkdir(binFolder);
-        System.out.println(String.format("[%s] Working directory: %s",
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.TAIWAN).format(Calendar.getInstance().getTime()),
-                workingDirectory));
     }
 
     public JudgeResult judge(Mode mode) throws Exception {
-        validateInput();
         judgeTime = System.currentTimeMillis();
+
+        // Create working directorty
+        if (JOJS.CONFIG.getString("working_dir").equals("auto"))
+            workingDirectory = new File(FileUtils.getTempDirectory(), String.format("jojs/%s/%s_%d", hwID, studentID, judgeTime));
+        else
+            workingDirectory = new File(JOJS.CONFIG.getString("working_dir"), String.format("jojs/%s/%s_%d", hwID, studentID, judgeTime));
+        srcFolder = new File(workingDirectory, "src");
+        binFolder = new File(workingDirectory, "bin");
+        FileUtils.forceMkdir(binFolder);
+        System.out.println(String.format("[%s] Working directory: %s",
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.TAIWAN).format(judgeTime),
+                workingDirectory));
+
+        validateInput();
 
         // Compile
         reporter.reportProgress(0.5, "Compiling");

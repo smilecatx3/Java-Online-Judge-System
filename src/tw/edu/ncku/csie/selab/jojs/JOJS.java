@@ -37,7 +37,8 @@ public class JOJS {
                 numRunningThreads++;
                 return judger.judge(mode);
             } finally {
-                judger.clean();
+                if (CONFIG.getBoolean("cleanup"))
+                    judger.clean();
                 numRunningThreads--;
                 if (numRunningThreads == 0)
                     executor.shutdownNow();
