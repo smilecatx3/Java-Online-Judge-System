@@ -19,6 +19,7 @@ import tw.edu.ncku.csie.selab.jojs.JudgeResult;
 public abstract class Judger {
     public enum Mode { STANDARD, STDIN }
 
+    private long judgeTime;
     private String hwID, studentID;
     private File srcFolder, binFolder;
     private String entryPoint;
@@ -47,6 +48,7 @@ public abstract class Judger {
 
     public JudgeResult judge(Mode mode) throws Exception {
         validateInput();
+        judgeTime = System.currentTimeMillis();
 
         // Compile
         reporter.reportProgress(0.5, "Compiling");
@@ -55,6 +57,10 @@ public abstract class Judger {
         // Execute
         File testcase = new File(JOJS.CONFIG.getString("testcase_dir"), hwID+".json");
         return new ExecutionTask(testcase, binFolder, entryPoint, mode, reporter).execute();
+    }
+
+    public long getJudgeTime() {
+        return judgeTime;
     }
 
     public void clean() {
