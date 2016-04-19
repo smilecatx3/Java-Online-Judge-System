@@ -34,7 +34,7 @@ public class JOJS {
 
     public synchronized static Future<JudgeResult> judge(Judger judger, Judger.Mode mode) {
         if (numRunningThreads == 0)
-            executor = Executors.newFixedThreadPool(CONFIG.getInt("max_thread"));
+            executor = Executors.newFixedThreadPool(MAX_THREADS);
 
         return executor.submit(() -> {
             try {

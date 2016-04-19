@@ -35,6 +35,7 @@ public class ExecutionTask {
         JSONArray outputs = testcase.getJSONArray("outputs");
         long globalTimeout = testcase.has("timeout") ? testcase.getLong("timeout")*outputs.length() : JOJS.CONFIG.getLong("timeout");
         ProcessExecutor executor = testcase.has("timeout") ? new ProcessExecutor(testcase.getLong("timeout")) : new ProcessExecutor();
+        int trimLevel = testcase.has("trim") ? testcase.getInt("trim") : JOJSConstants.TRIM_ALL;
 
         if (testcase.has("rules")) {
             RuleValidator validator = new RuleValidator(binFolder, testcase.getJSONArray("rules"));
@@ -66,8 +67,15 @@ public class ExecutionTask {
             if (result.isTimeout) {
                 results[i] = new ExecutionResult(false, "Time limit exceeded");
             } else {
-                String answer = result.output.replace("\r", "").trim(); // Your output
-                String output = outputs.getString(i).replace("\r", "").trim(); // Expected output
+                String answer = result.output.replace("\r", ""); // Your output
+                String output = outputs.getString(i).replace("\r", ""); // Expected output
+                if (trimLevel == JOJSConstants.TRIM_ALL) {
+                    answer = answer.trim();
+                    output = output.trim();
+                } else if (trimLevel == JOJSConstants.TRIM_LAST) {
+                    answer = answer.replaceFirst("\\s+$", "");
+                    output = output.replaceFirst("\\s+$", "");
+                }
                 boolean passed = answer.equals(output);
                 results[i] = new ExecutionResult(passed, answer);
             }
